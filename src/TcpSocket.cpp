@@ -30,14 +30,14 @@ static std::string ft_ltoa(int64_t n) throw()
 
 TcpSocket::TcpSocket(uint16_t port) : m_fd(-1)
 {
+	m_fd = ::socket(DEFAULT_FAMILY, DEFAULT_STREAM, 0);
+	if (m_fd == -1) {
+		throw std::runtime_error("Could not create TCP socket on port " + ft_ltoa(port));
+	}
 	sockaddr_in address = {};
 	address.sin_family = DEFAULT_FAMILY;
 	address.sin_port = htons(port);
 	address.sin_addr.s_addr = DEFAULT_ADDR;
-	m_fd = socket(address.sin_family, port, 0);
-	if (m_fd == -1) {
-		throw std::runtime_error("Could not create TCP socket on port " + ft_ltoa(port));
-	}
 	if (::bind(m_fd, (struct sockaddr *)&address, sizeof(address)) == -1) {
 		::close(m_fd);
 		throw std::runtime_error("Could not bind TCP socket on port " + ft_ltoa(port));
