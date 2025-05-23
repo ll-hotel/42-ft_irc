@@ -2,6 +2,7 @@
 
 #include "SocketAddr.hpp"
 #include "TcpStream.hpp"
+#include "Command.hpp"
 #include <string>
 
 struct User
@@ -10,9 +11,13 @@ struct User
 	SocketAddr addr;
 	std::string name;
 	std::string nick;
-	std::string streamBuffer;
+	Command nextCommand;
 
-	explicit User(const TcpStream &stream, const SocketAddr &addr);
+	User(const TcpStream &stream, const SocketAddr &addr);
 	~User();
 	bool receive();
+	bool parseNextCommand();
+
+private:
+	std::string m_streamBuffer;
 };

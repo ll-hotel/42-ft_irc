@@ -8,6 +8,7 @@ SOURCES += TcpSocket.cpp
 SOURCES += TcpStream.cpp
 SOURCES += User.cpp
 SOURCES += Channel.cpp
+SOURCES += Command.cpp
 
 SOURCE_DIR := src
 BUILD_DIR := build
@@ -57,5 +58,5 @@ run:
 .PHONY: valgrind
 valgrind:
 	make $(NAME)
-	valgrind -q ./$(NAME) 8080 bocal
+	valgrind -q --track-fds=all ./$(NAME) 8080 bocal
 

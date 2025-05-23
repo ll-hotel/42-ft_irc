@@ -11,7 +11,7 @@ Epoll::Epoll(uint timeout) : m_timeout(timeout)
 
 Epoll::~Epoll() throw()
 {
-	close(m_epollFd);
+	::close(m_epollFd);
 }
 
 bool Epoll::ctl(int op, int fd, EpollEvent &event) throw()
@@ -46,4 +46,14 @@ bool Epoll::ctlDel(int fd) throw()
 ssize_t Epoll::wait(std::vector<EpollEvent> &buf) throw()
 {
 	return ::epoll_wait(m_epollFd, buf.data(), buf.size(), m_timeout);
+}
+
+std::ostream &operator<<(std::ostream &os, const struct epoll_event &event)
+{
+	os << "fd: " << event.data.fd << ", event: [" << ((event.events & EPOLLIN) ? "EPOLLIN, " : "")
+	   << ((event.events & EPOLLOUT) ? "EPOLLOUT, " : "")
+	   << ((event.events & EPOLLHUP) ? "EPOLLHUP, " : "")
+	   << ((event.events & EPOLLET) ? "EPOLLET, " : "")
+	   << ((event.events & EPOLLERR) ? "EPOLLERR, " : "") << "]";
+	return os;
 }
