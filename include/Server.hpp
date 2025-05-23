@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Epoll.hpp"
 #include "TcpSocket.hpp"
 #include "User.hpp"
 #include <string>
@@ -12,9 +13,12 @@ private:
 	std::string m_password;
 	bool m_running;
 	std::vector<User *> m_users;
+	Epoll m_epoll;
 
 public:
 	explicit Server(uint16_t port, const std::string &password);
 	~Server();
 	void run();
+	User *getUserByFd(int fd) const throw();
+	void routine();
 };

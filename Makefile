@@ -54,3 +54,8 @@ run:
 	make $(NAME)
 	./$(NAME) 8080 bocal
 
+.PHONY: valgrind
+valgrind:
+	make $(NAME)
+	valgrind -q ./$(NAME) 8080 bocal
+
