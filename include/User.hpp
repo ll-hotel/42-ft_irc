@@ -1,8 +1,8 @@
 #pragma once
 
+#include "Command.hpp"
 #include "SocketAddr.hpp"
 #include "TcpStream.hpp"
-#include "Command.hpp"
 #include <string>
 
 struct User
@@ -12,6 +12,7 @@ struct User
 	std::string name;
 	std::string nick;
 	Command nextCommand;
+	bool authenticated;
 
 	User(const TcpStream &stream, const SocketAddr &addr);
 	~User();
