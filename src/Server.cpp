@@ -16,6 +16,7 @@ Server::~Server()
 		m_epoll.ctlDel(m_users[i]->stream.rawFd());
 		delete m_users[i];
 	}
+	m_users.clear();
 }
 
 extern bool sigint_received;
@@ -46,6 +47,7 @@ void Server::routine()
 	}
 	for (ssize_t cur_act = 0; cur_act < action_count; cur_act++) {
 		const EpollEvent &event = events[cur_act];
+		std::cerr << event << std::endl;
 		if (event.data.fd == m_socket.rawFd()) {
 			std::pair<TcpStream, SocketAddr> tmp = m_socket.accept();
 			User *user = new User(tmp.first, tmp.second);
@@ -57,17 +59,24 @@ void Server::routine()
 			if (user_pos == m_users.end()) {
 				std::cerr << "No such client" << std::endl;
 				m_epoll.ctlDel(event.data.fd);
+				delete *user_pos;
 				m_users.erase(user_pos);
 				continue;
 			}
-			if (event.events & EPOLLERR) {
+			if (event.events & (EPOLLERR | EPOLLHUP)) {
 				m_epoll.ctlDel(event.data.fd);
+				delete *user_pos;
 				m_users.erase(user_pos);
 				continue;
 			}
 			User &user = **user_pos;
 			if (event.events & EPOLLIN) {
-				user.receive();
+				if (!user.receive()) {
+					m_epoll.ctlDel(event.data.fd);
+					delete *user_pos;
+					m_users.erase(user_pos);
+					continue;
+				}
 				do {
 					const size_t crlf = user.streamBuffer.find("\r\n");
 					if (crlf == std::string::npos)

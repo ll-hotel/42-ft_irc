@@ -47,3 +47,13 @@ ssize_t Epoll::wait(std::vector<EpollEvent> &buf) throw()
 {
 	return ::epoll_wait(m_epollFd, buf.data(), buf.size(), m_timeout);
 }
+
+std::ostream &operator<<(std::ostream &os, const struct epoll_event &event)
+{
+	os << "fd: " << event.data.fd << ", event: [" << ((event.events & EPOLLIN) ? "EPOLLIN, " : "")
+	   << ((event.events & EPOLLOUT) ? "EPOLLOUT, " : "")
+	   << ((event.events & EPOLLHUP) ? "EPOLLHUP, " : "")
+	   << ((event.events & EPOLLET) ? "EPOLLET, " : "")
+	   << ((event.events & EPOLLERR) ? "EPOLLERR, " : "") << "]";
+	return os;
+}

@@ -57,5 +57,5 @@ run:
 .PHONY: valgrind
 valgrind:
 	make $(NAME)
-	valgrind -q ./$(NAME) 8080 bocal
+	valgrind -q --track-fds=all ./$(NAME) 8080 bocal
 

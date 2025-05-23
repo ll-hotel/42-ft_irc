@@ -1,6 +1,7 @@
 #ifndef EPOLL_HPP
 #define EPOLL_HPP
 
+#include <ostream>
 #include <sys/epoll.h>
 #include <unistd.h>
 #include <vector>
@@ -28,5 +29,7 @@ private:
 	Epoll(const Epoll &);
 	Epoll &operator=(const Epoll &);
 };
+
+std::ostream &operator<<(std::ostream &os, const struct epoll_event &event);
 
 #endif /* EPOLL_HPP */
