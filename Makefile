@@ -37,3 +37,7 @@ fclean: | clean
 .PHONY: re
 re: | fclean
 	@$(MAKE) --no-print-directory
+
+.PHONY: format
+format:
+	find $(SOURCE_DIR) include -name '*.hpp' -or -name '*.cpp' -exec clang-format -i '{}' ';'
