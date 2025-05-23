@@ -13,8 +13,7 @@ int main(int argc, char **argv)
 		return (error(argv[0], 1));
 
 	Server server(atol(argv[1]), argv[2]);
-	while (1)
-		;
+	server.run();
 	return (0);
 }
 

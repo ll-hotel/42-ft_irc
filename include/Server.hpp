@@ -8,8 +8,10 @@ class Server
 private:
 	TcpSocket m_socket;
 	std::string m_password;
+	bool m_running;
 
 public:
-	Server(uint16_t port, const std::string &password);
+	explicit Server(uint16_t port, const std::string &password);
 	~Server();
+	void run();
 };
