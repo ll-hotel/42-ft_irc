@@ -15,6 +15,7 @@ struct Channel
 	bool addUser(const User &user);
 	bool removeUser(const User &user);
 	void sendMsg(const std::string &msg);
+	const std::string &name() const throw();
 
 private:
 	std::string m_name;

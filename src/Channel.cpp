@@ -33,6 +33,11 @@ void Channel::sendMsg(const std::string &msg)
 	}
 }
 
+const std::string &Channel::name() const throw()
+{
+	return m_name;
+}
+
 size_t Channel::createId() throw()
 {
 	static size_t current_id = 0;
