@@ -19,6 +19,6 @@ public:
 	explicit Server(uint16_t port, const std::string &password);
 	~Server();
 	void run();
-	User *getUserByFd(int fd) const throw();
+	std::vector<User *>::iterator getUserByFd(int fd) throw();
 	void routine();
 };
