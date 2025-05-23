@@ -41,3 +41,9 @@ re: | fclean
 .PHONY: format
 format:
 	find $(SOURCE_DIR) include -name '*.hpp' -or -name '*.cpp' -exec clang-format -i '{}' ';'
+
+.PHONY: run
+run:
+	make $(NAME)
+	./$(NAME) 8080 bocal
+

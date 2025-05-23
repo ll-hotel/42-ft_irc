@@ -1,3 +1,5 @@
+#include <Server.hpp>
+#include <cstdlib>
 #include <iostream>
 
 int error(const std::string &exec_file_name, int cause);
@@ -10,7 +12,9 @@ int main(int argc, char **argv)
 	if (!is_number(argv[1]))
 		return (error(argv[0], 1));
 
-	// create server
+	Server server(atol(argv[1]), argv[2]);
+	while (1)
+		;
 	return (0);
 }
 
