@@ -1,6 +1,13 @@
 NAME = ft_irc
 
-SOURCES := Epoll.cpp  main.cpp  Server.cpp  SocketAddr.cpp  TcpSocket.cpp  TcpStream.cpp
+SOURCES := main.cpp
+SOURCES += Epoll.cpp
+SOURCES += Server.cpp
+SOURCES += SocketAddr.cpp
+SOURCES += TcpSocket.cpp
+SOURCES += TcpStream.cpp
+SOURCES += User.cpp
+SOURCES += Channel.cpp
 
 SOURCE_DIR := src
 BUILD_DIR := build
