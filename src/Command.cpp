@@ -61,3 +61,13 @@ static void parse_args(const std::string &input, size_t pos, std::vector<std::st
 		pos = word_end;
 	}
 }
+
+std::ostream &operator<<(std::ostream &os, const Command &command)
+{
+	os << command.name << ':';
+	for (std::vector<std::string>::const_iterator it = command.args.begin();
+		 it != command.args.end(); it += 1) {
+		os << ' ' << *it;
+	}
+	return os;
+}

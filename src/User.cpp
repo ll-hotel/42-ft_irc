@@ -3,12 +3,15 @@
 #include <ostream>
 
 User::User(const TcpStream &stream, const SocketAddr &addr)
-	: stream(stream), addr(addr), name(), nick(), nextCommand(), m_streamBuffer()
+	: stream(stream), addr(addr), name(), nick(), nextCommand(), authenticated(false),
+	  m_streamBuffer()
 {
+	std::cerr << "user " << this->stream.rawFd() << " created" << std::endl;
 }
 
 User::~User()
 {
+	std::cerr << "user " << stream.rawFd() << " deleted" << std::endl;
 }
 
 bool User::receive()

@@ -21,4 +21,5 @@ public:
 	void run();
 	std::vector<User *>::iterator getUserByFd(int fd) throw();
 	void routine();
+	void processCommand(User &user, Command &Command);
 };

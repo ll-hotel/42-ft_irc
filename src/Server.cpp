@@ -78,15 +78,22 @@ void Server::routine()
 					continue;
 				}
 				while (user.parseNextCommand()) {
-					std::cout << user.nextCommand.name << ':';
-					for (std::vector<std::string>::const_iterator it =
-							 user.nextCommand.args.begin();
-						 it != user.nextCommand.args.end(); it += 1) {
-						 	std::cout << ' ' << *it;
-					}
-					std::cout << std::endl;
+					std::cerr << user.nextCommand << std::endl;
+					processCommand(user, user.nextCommand);
 				}
 			}
+		}
+	}
+}
+
+void Server::processCommand(User &user, Command &Command)
+{
+	if (Command.name == "PASS") {
+		if (Command.args[0] == this->m_password) {
+			user.authenticated = true;
+			std::cerr << "user " << user.stream.rawFd() << " is now connected" << std::endl;
+		}
+		else {
 		}
 	}
 }

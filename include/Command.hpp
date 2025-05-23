@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ostream>
 #include <string>
 #include <vector>
 
@@ -12,3 +13,5 @@ struct Command
 	explicit Command();
 	explicit Command(const std::string &input);
 };
+
+std::ostream &operator<<(std::ostream &os, const Command &command);
