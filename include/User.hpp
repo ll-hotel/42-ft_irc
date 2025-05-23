@@ -8,8 +8,8 @@ struct User
 {
 	TcpStream stream;
 	SocketAddr addr;
-	std::string username;
-	std::string nickanme;
+	std::string name;
+	std::string nick;
 
 	explicit User(const TcpStream &stream, const SocketAddr &addr);
 	~User();
