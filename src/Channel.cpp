@@ -12,7 +12,7 @@ Channel::~Channel()
 bool Channel::addUser(const User &user)
 {
 	m_users.push_back(&user);
-	return false;
+	return true;
 }
 
 bool Channel::removeUser(const User &user)
