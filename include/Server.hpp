@@ -6,7 +6,16 @@
 #include <string>
 #include <vector>
 
-enum NumericReplyCode { ERR_NEEDMOREPARAMS = 461, ERR_ALREADYREGISTERED = 462 };
+enum NumericReplyCode {
+	// PASS
+	ERR_NEEDMOREPARAMS = 461,
+	ERR_ALREADYREGISTERED = 462,
+	// NICK
+	ERR_NONICKNAMEGIVEN = 431,
+	// ERR_ERRONEUSNICKNAME = 432, /* Not used, because we do not have a nickname 'blacklist' */
+	ERR_NICKNAMEINUSE = 433,
+	ERR_NICKCOLLISION = 436
+};
 
 class Server
 {
@@ -26,4 +35,5 @@ public:
 	void processCommand(const Command &command, User &user);
 	void reply(const NumericReplyCode code, const User &user) const;
 	void commandPass(const Command &command, User &user) const;
+	void commandNick(const Command &command, User &user) const;
 };

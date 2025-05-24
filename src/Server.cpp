@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include "Command.hpp"
 #include "Epoll.hpp"
 #include <iostream>
 #include <stdexcept>
@@ -97,6 +98,14 @@ void Server::processCommand(const Command &command, User &user)
 				  << " while not authenticated" << std::endl;
 		return;
 	}
+	switch (command.id) {
+	case Command::NICK:
+		this->commandNick(command, user);
+		break;
+	case Command::UNKNOWN:
+	default:
+		break;
+	}
 }
 
 void Server::reply(const NumericReplyCode code, const User &user) const
@@ -120,6 +129,15 @@ void Server::reply(const NumericReplyCode code, const User &user) const
 	case ERR_ALREADYREGISTERED: {
 		reply_str.append(":Already registered");
 	} break;
+	case ERR_NONICKNAMEGIVEN: {
+		reply_str.append(":No nickname given");
+	} break;
+	case ERR_NICKNAMEINUSE: {
+		reply_str.append(":Nickname already in use");
+	} break;
+	case ERR_NICKCOLLISION: {
+		reply_str.append(":Nickname collision");
+	} break;
 	}
 	reply_str.append("\r\n");
 	user.stream.send(reply_str.data(), reply_str.size());
@@ -139,4 +157,24 @@ void Server::commandPass(const Command &command, User &user) const
 	}
 	user.authenticated = true;
 	std::cerr << "User " << user.stream.rawFd() << " authenticated" << std::endl;
+}
+
+void Server::commandNick(const Command &command, User &user) const
+{
+	if (command.args.size() < 1) {
+		this->reply(ERR_NONICKNAMEGIVEN, user);
+		return;
+	}
+	const std::string &new_nick = command.args[0];
+	if (user.nick == new_nick) {
+		this->reply(ERR_NICKNAMEINUSE, user);
+		return;
+	}
+	for (size_t i = 0; i < m_users.size(); i += 1) {
+		if (m_users[i]->nick == new_nick) {
+			this->reply(ERR_NICKCOLLISION, user);
+			return;
+		}
+	}
+	user.nick = new_nick;
 }

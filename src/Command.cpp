@@ -19,23 +19,11 @@ Command::Command(const std::string &input) : name(), args(), id(UNKNOWN)
 
 static Command::Id find_id(const std::string &command_name) throw()
 {
-	if (command_name == "CAP") {
-		return Command::CAP;
-	}
-	else if (command_name == "PASS") {
+	if (command_name == "PASS") {
 		return Command::PASS;
 	}
 	else if (command_name == "NICK") {
 		return Command::NICK;
-	}
-	else if (command_name == "USER") {
-		return Command::USER;
-	}
-	else if (command_name == "JOIN") {
-		return Command::JOIN;
-	}
-	else if (command_name == "QUIT") {
-		return Command::QUIT;
 	}
 	return Command::UNKNOWN;
 }
