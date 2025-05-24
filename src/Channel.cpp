@@ -26,7 +26,7 @@ bool Channel::removeUser(User &user)
 	return false;
 }
 
-void Channel::sendMsg(const std::string &msg)
+void Channel::broadcast(const std::string &msg)
 {
 	for (size_t i = 0; i < m_users.size(); i += 1) {
 		m_users[i]->stream.send(msg.data(), msg.size());

@@ -18,6 +18,6 @@ void Server::commandJoin(const Command &command, User &user)
 	channel.addUser(user);
 	std::string notification = ":" + user.nickname + '!' + user.servername + "@localhost" + ' ' +
 							   "JOIN" + ' ' + channel.name() + "\r\n";
-	channel.sendMsg(notification);
+	channel.broadcast(notification);
 	this->commandNames(channel, user);
 }

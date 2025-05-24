@@ -14,7 +14,7 @@ struct Channel
 
 	bool addUser(User &user);
 	bool removeUser(User &user);
-	void sendMsg(const std::string &msg);
+	void broadcast(const std::string &msg);
 	const std::string &name() const throw();
 	const std::vector<User *> &users() const throw();
 
