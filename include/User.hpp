@@ -9,10 +9,15 @@ struct User
 {
 	TcpStream stream;
 	SocketAddr addr;
-	std::string name;
-	std::string nick;
 	Command nextCommand;
-	bool authenticated;
+	bool didPass;
+	bool didNick;
+	bool didUser;
+	std::string nickname;
+	std::string username;
+	std::string hostname;
+	std::string servername;
+	std::string realname;
 
 	User(const TcpStream &stream, const SocketAddr &addr);
 	~User();

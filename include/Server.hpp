@@ -15,6 +15,9 @@ enum NumericReplyCode {
 	// ERR_ERRONEUSNICKNAME = 432, /* Not used, because we do not have a nickname 'blacklist' */
 	ERR_NICKNAMEINUSE = 433,
 	ERR_NICKCOLLISION = 436
+	// USER
+	// ERR_NEEDMOREPARAMS
+	// ERR_ALREADYREGISTERED
 };
 
 class Server
@@ -36,4 +39,5 @@ public:
 	void reply(const NumericReplyCode code, const User &user) const;
 	void commandPass(const Command &command, User &user) const;
 	void commandNick(const Command &command, User &user) const;
+	void commandUser(const Command &command, User &user) const;
 };

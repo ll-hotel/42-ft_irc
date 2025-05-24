@@ -91,17 +91,29 @@ extern std::string ft_ltoa(int64_t n);
 
 void Server::processCommand(const Command &command, User &user)
 {
-	if (command.id == Command::PASS)
+	if (command.id == Command::PASS) {
 		this->commandPass(command, user);
-	else if (not user.authenticated) {
+		return;
+	}
+	else if (not user.didPass) {
 		std::cerr << "User " << user.stream.rawFd() << " tried to " << command.name
 				  << " while not authenticated" << std::endl;
 		return;
 	}
-	switch (command.id) {
-	case Command::NICK:
+	if (command.id == Command::NICK) {
 		this->commandNick(command, user);
-		break;
+		return;
+	}
+	else if (command.id == Command::USER) {
+		this->commandUser(command, user);
+		return;
+	}
+	else if (not user.didNick or not user.didUser) {
+		std::cerr << "User " << user.stream.rawFd() << " tried to " << command.name
+				  << " while not registered" << std::endl;
+		return;
+	}
+	switch (command.id) {
 	case Command::UNKNOWN:
 	default:
 		break;
@@ -116,10 +128,10 @@ void Server::reply(const NumericReplyCode code, const User &user) const
 	reply_str.push_back(' ');
 	reply_str.append(ft_ltoa(code));
 	reply_str.push_back(' ');
-	if (user.nick.empty())
+	if (user.nickname.empty())
 		reply_str.push_back('*');
 	else
-		reply_str.append(user.nick);
+		reply_str.append(user.nickname);
 	reply_str.push_back(' ');
 
 	switch (code) {
@@ -151,11 +163,11 @@ void Server::commandPass(const Command &command, User &user) const
 	}
 	if (command.args[0] != m_password)
 		return;
-	if (user.authenticated) {
+	if (user.didPass) {
 		this->reply(ERR_ALREADYREGISTERED, user);
 		return;
 	}
-	user.authenticated = true;
+	user.didPass = true;
 	std::cerr << "User " << user.stream.rawFd() << " authenticated" << std::endl;
 }
 
@@ -166,15 +178,33 @@ void Server::commandNick(const Command &command, User &user) const
 		return;
 	}
 	const std::string &new_nick = command.args[0];
-	if (user.nick == new_nick) {
+	if (user.nickname == new_nick) {
 		this->reply(ERR_NICKNAMEINUSE, user);
 		return;
 	}
 	for (size_t i = 0; i < m_users.size(); i += 1) {
-		if (m_users[i]->nick == new_nick) {
+		if (m_users[i]->nickname == new_nick) {
 			this->reply(ERR_NICKCOLLISION, user);
 			return;
 		}
 	}
-	user.nick = new_nick;
+	user.nickname = new_nick;
+	user.didNick = true;
+}
+
+void Server::commandUser(const Command &command, User &user) const
+{
+	if (user.didUser) {
+		this->reply(ERR_ALREADYREGISTERED, user);
+		return;
+	}
+	if (command.args.size() != 4) {
+		this->reply(ERR_NEEDMOREPARAMS, user);
+		return;
+	}
+	user.username = command.args[0];
+	user.hostname = command.args[1];
+	user.servername = command.args[2];
+	user.realname = command.args[3];
+	user.didUser = true;
 }

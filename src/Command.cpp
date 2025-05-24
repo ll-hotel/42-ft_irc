@@ -25,6 +25,9 @@ static Command::Id find_id(const std::string &command_name) throw()
 	else if (command_name == "NICK") {
 		return Command::NICK;
 	}
+	else if (command_name == "USER") {
+		return Command::USER;
+	}
 	return Command::UNKNOWN;
 }
 

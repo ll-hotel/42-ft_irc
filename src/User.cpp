@@ -2,8 +2,7 @@
 #include <iostream>
 
 User::User(const TcpStream &stream, const SocketAddr &addr)
-	: stream(stream), addr(addr), name(), nick(), nextCommand(), authenticated(false),
-	  m_streamBuffer()
+	: stream(stream), addr(addr), didPass(false), didNick(false), didUser(false)
 {
 	std::cerr << "User " << this->stream.rawFd() << " created" << std::endl;
 }
