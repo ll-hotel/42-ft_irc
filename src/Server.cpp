@@ -6,7 +6,7 @@
 #include <stdint.h>
 
 Server::Server(uint16_t port, const std::string &password)
-	: m_socket(port), m_password(password), m_running(true), m_epoll(1000)
+	: m_socket(port), m_epoll(1000), m_password(password), m_running(true), m_hostname("localhost")
 {
 	m_epoll.ctlAdd(m_socket.rawFd(), EPOLLIN);
 }
@@ -18,6 +18,10 @@ Server::~Server()
 		delete m_users[i];
 	}
 	m_users.clear();
+	for (size_t i = 0; i < m_channels.size(); i += 1) {
+		delete m_channels[i];
+	}
+	m_channels.clear();
 }
 
 extern bool sigint_received;
@@ -82,15 +86,23 @@ void Server::routine()
 					std::cerr << user.nextCommand << std::endl;
 					this->processCommand(user.nextCommand, user);
 				}
+				m_epoll.ctlMod(event.data.fd, EPOLLIN | EPOLLOUT);
 			}
 			if (event.events & EPOLLOUT) {
-				user.flush();
+				try {
+					if (user.flush())
+						m_epoll.ctlMod(event.data.fd, EPOLLIN);
+				} catch (const std::runtime_error &e) {
+					std::cerr << e.what() << std::endl;
+					m_epoll.ctlDel(event.data.fd);
+					delete *user_pos;
+					m_users.erase(user_pos);
+					continue;
+				}
 			}
 		}
 	}
 }
-
-extern std::string ft_ltoa(int64_t n);
 
 void Server::processCommand(const Command &command, User &user)
 {
@@ -111,12 +123,15 @@ void Server::processCommand(const Command &command, User &user)
 		this->commandUser(command, user);
 		return;
 	}
-	else if (not user.didNick or not user.didUser) {
+	else if (not user.registered()) {
 		std::cerr << "User " << user.stream.rawFd() << " tried to " << command.name
 				  << " while not registered" << std::endl;
 		return;
 	}
 	switch (command.id) {
+	case Command::JOIN:
+		this->commandJoin(command, user);
+		break;
 	case Command::UNKNOWN:
 	default:
 		break;
@@ -127,7 +142,7 @@ void Server::reply(const NumericReplyCode code, User &user) const
 {
 	std::string reply_str;
 	reply_str.push_back(':');
-	reply_str.append("server_ip");
+	reply_str.append(m_hostname);
 	reply_str.push_back(' ');
 	reply_str.append(ft_ltoa(code));
 	reply_str.push_back(' ');
@@ -137,22 +152,23 @@ void Server::reply(const NumericReplyCode code, User &user) const
 		reply_str.append(user.nickname);
 	reply_str.push_back(' ');
 
-	switch (code) {
-	case ERR_NEEDMOREPARAMS: {
+	if (code == ERR_NEEDMOREPARAMS) {
 		reply_str.append(":Need more params");
-	} break;
-	case ERR_ALREADYREGISTERED: {
+	}
+	else if (code == ERR_ALREADYREGISTERED) {
 		reply_str.append(":Already registered");
-	} break;
-	case ERR_NONICKNAMEGIVEN: {
+	}
+	else if (code == ERR_NONICKNAMEGIVEN) {
 		reply_str.append(":No nickname given");
-	} break;
-	case ERR_NICKNAMEINUSE: {
+	}
+	else if (code == ERR_NICKNAMEINUSE) {
 		reply_str.append(":Nickname already in use");
-	} break;
-	case ERR_NICKCOLLISION: {
+	}
+	else if (code == ERR_NICKCOLLISION) {
 		reply_str.append(":Nickname collision");
-	} break;
+	}
+	else if (code == RPL_WELCOME) {
+		reply_str.append(":Welcome to our IRC server!");
 	}
 	reply_str.append("\r\n");
 	user.send(reply_str);
@@ -193,6 +209,8 @@ void Server::commandNick(const Command &command, User &user) const
 	}
 	user.nickname = new_nick;
 	user.didNick = true;
+	if (user.registered())
+		this->reply(RPL_WELCOME, user);
 }
 
 void Server::commandUser(const Command &command, User &user) const
@@ -210,4 +228,15 @@ void Server::commandUser(const Command &command, User &user) const
 	user.servername = command.args[2];
 	user.realname = command.args[3];
 	user.didUser = true;
+	if (user.registered())
+		this->reply(RPL_WELCOME, user);
+}
+
+std::vector<Channel *>::iterator Server::getChannelByName(const std::string &name) throw()
+{
+	for (std::vector<Channel *>::iterator it = m_channels.begin(); it != m_channels.end(); it++) {
+		if ((*it)->name() == name)
+			return it;
+	}
+	return m_channels.end();
 }

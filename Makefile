@@ -9,6 +9,8 @@ SOURCES += TcpStream.cpp
 SOURCES += User.cpp
 SOURCES += Channel.cpp
 SOURCES += Command.cpp
+SOURCES += command_join.cpp
+SOURCES += command_names.cpp
 
 SOURCE_DIR := src
 BUILD_DIR := build
@@ -19,7 +21,7 @@ DEPENDS := $(patsubst %.o, %.d, $(OBJECTS))
 
 CXX := c++
 CPPFLAGS := -MMD -MP
-CXXFLAGS := -Wall -Wextra -Werror -Wpedantic -std=c++98
+CXXFLAGS := -Wall -Wextra -Werror -Wpedantic -std=c++98 -g
 CXXFLAGS += -Iinclude/
 
 .PHONY: all

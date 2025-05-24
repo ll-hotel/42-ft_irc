@@ -3,6 +3,7 @@
 
 #include <cstdio>
 #include <stdint.h>
+#include <string>
 
 struct TcpStream {
 	explicit TcpStream() throw();
@@ -15,6 +16,7 @@ struct TcpStream {
 	int32_t dupFd() const;
 	ssize_t recv(char ptr[], size_t len) const throw();
 	ssize_t send(const char ptr[], size_t len) const throw();
+	ssize_t send(const std::string &) const throw();
 
 private:
 	int32_t m_fd;

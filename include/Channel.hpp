@@ -12,14 +12,15 @@ struct Channel
 	explicit Channel(const std::string &name);
 	~Channel();
 
-	bool addUser(const User &user);
-	bool removeUser(const User &user);
+	bool addUser(User &user);
+	bool removeUser(User &user);
 	void sendMsg(const std::string &msg);
 	const std::string &name() const throw();
+	const std::vector<User *> &users() const throw();
 
 private:
+	std::vector<User *> m_users;
 	std::string m_name;
-	std::vector<const User *> m_users;
 
 	static size_t createId() throw();
 };

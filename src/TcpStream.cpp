@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <cstring>
 #include <stdexcept>
+#include <string>
 #include <sys/socket.h>
 #include <unistd.h>
 
@@ -51,4 +52,9 @@ ssize_t TcpStream::recv(char ptr[], size_t len) const throw()
 ssize_t TcpStream::send(const char ptr[], size_t len) const throw()
 {
 	return ::send(m_fd, ptr, len, 0);
+}
+
+ssize_t TcpStream::send(const std::string &msg) const throw()
+{
+	return ::send(m_fd, msg.data(), msg.size(), 0);
 }

@@ -25,6 +25,7 @@ struct User
 	void send(const std::string &message);
 	bool flush();
 	bool parseNextCommand();
+	bool registered() const throw();
 
 private:
 	std::string m_streamBuffer;

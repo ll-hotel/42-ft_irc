@@ -23,4 +23,6 @@ private:
 	TcpSocket &operator=(TcpSocket &);
 };
 
+extern std::string ft_ltoa(int64_t n);
+
 #endif /* WEBSERV_TCP_SOCKET_HPP */

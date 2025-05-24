@@ -1,7 +1,7 @@
 #include "Channel.hpp"
 #include "User.hpp"
 
-Channel::Channel(const std::string &name) : id(createId()), m_name(name), m_users()
+Channel::Channel(const std::string &name) : id(createId()), m_name(name)
 {
 }
 
@@ -9,16 +9,16 @@ Channel::~Channel()
 {
 }
 
-bool Channel::addUser(const User &user)
+bool Channel::addUser(User &user)
 {
 	m_users.push_back(&user);
 	return true;
 }
 
-bool Channel::removeUser(const User &user)
+bool Channel::removeUser(User &user)
 {
 	for (size_t i = 0; i < m_users.size(); i += 1) {
-		if (m_users[i]->name == user.name) {
+		if (m_users[i]->username == user.username) {
 			m_users.erase(m_users.begin() + i);
 			return true;
 		}
@@ -36,6 +36,11 @@ void Channel::sendMsg(const std::string &msg)
 const std::string &Channel::name() const throw()
 {
 	return m_name;
+}
+
+const std::vector<User *> &Channel::users() const throw()
+{
+	return m_users;
 }
 
 size_t Channel::createId() throw()
