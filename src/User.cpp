@@ -23,6 +23,20 @@ bool User::receive()
 	return true;
 }
 
+void User::send(const std::string &message)
+{
+	m_sendBuffer += message;
+}
+
+bool User::flush()
+{
+	ssize_t len = stream.send(m_sendBuffer.c_str(), m_sendBuffer.size());
+	if (len == -1)
+		return (false);
+	m_sendBuffer.erase(0, len);
+	return (true);
+}
+
 bool User::parseNextCommand()
 {
 	const size_t crlf = this->m_streamBuffer.find("\r\n");

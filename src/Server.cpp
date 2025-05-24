@@ -48,7 +48,7 @@ void Server::routine()
 	}
 	for (ssize_t cur_act = 0; cur_act < action_count; cur_act++) {
 		const EpollEvent &event = events[cur_act];
-		// std::cerr << event << std::endl;
+		std::cerr << event << std::endl;
 		if (event.data.fd == m_socket.rawFd()) {
 			std::pair<TcpStream, SocketAddr> tmp = m_socket.accept();
 			User *user = new User(tmp.first, tmp.second);
@@ -82,6 +82,9 @@ void Server::routine()
 					std::cerr << user.nextCommand << std::endl;
 					this->processCommand(user.nextCommand, user);
 				}
+			}
+			if (event.events & EPOLLOUT) {
+				user.flush();
 			}
 		}
 	}
@@ -120,7 +123,7 @@ void Server::processCommand(const Command &command, User &user)
 	}
 }
 
-void Server::reply(const NumericReplyCode code, const User &user) const
+void Server::reply(const NumericReplyCode code, User &user) const
 {
 	std::string reply_str;
 	reply_str.push_back(':');
@@ -152,7 +155,7 @@ void Server::reply(const NumericReplyCode code, const User &user) const
 	} break;
 	}
 	reply_str.append("\r\n");
-	user.stream.send(reply_str.data(), reply_str.size());
+	user.send(reply_str);
 }
 
 void Server::commandPass(const Command &command, User &user) const

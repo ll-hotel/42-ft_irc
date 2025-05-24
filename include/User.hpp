@@ -22,8 +22,11 @@ struct User
 	User(const TcpStream &stream, const SocketAddr &addr);
 	~User();
 	bool receive();
+	void send(const std::string &message);
+	bool flush();
 	bool parseNextCommand();
 
 private:
 	std::string m_streamBuffer;
+	std::string m_sendBuffer;
 };

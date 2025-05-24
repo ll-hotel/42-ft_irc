@@ -36,7 +36,7 @@ public:
 	std::vector<User *>::iterator getUserByFd(int fd) throw();
 	void routine();
 	void processCommand(const Command &command, User &user);
-	void reply(const NumericReplyCode code, const User &user) const;
+	void reply(const NumericReplyCode code, User &user) const;
 	void commandPass(const Command &command, User &user) const;
 	void commandNick(const Command &command, User &user) const;
 	void commandUser(const Command &command, User &user) const;
