@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+enum NumericReplyCode { ERR_NEEDMOREPARAMS = 461, ERR_ALREADYREGISTERED = 462 };
+
 class Server
 {
 private:
@@ -21,5 +23,7 @@ public:
 	void run();
 	std::vector<User *>::iterator getUserByFd(int fd) throw();
 	void routine();
-	void processCommand(User &user, Command &Command);
+	void processCommand(const Command &command, User &user);
+	void reply(const NumericReplyCode code, const User &user) const;
+	void commandPass(const Command &command, User &user) const;
 };

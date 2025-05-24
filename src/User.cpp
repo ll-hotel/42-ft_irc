@@ -1,17 +1,16 @@
 #include "User.hpp"
 #include <iostream>
-#include <ostream>
 
 User::User(const TcpStream &stream, const SocketAddr &addr)
 	: stream(stream), addr(addr), name(), nick(), nextCommand(), authenticated(false),
 	  m_streamBuffer()
 {
-	std::cerr << "user " << this->stream.rawFd() << " created" << std::endl;
+	std::cerr << "User " << this->stream.rawFd() << " created" << std::endl;
 }
 
 User::~User()
 {
-	std::cerr << "user " << stream.rawFd() << " deleted" << std::endl;
+	std::cerr << "User " << stream.rawFd() << " deleted" << std::endl;
 }
 
 bool User::receive()
@@ -30,7 +29,6 @@ bool User::parseNextCommand()
 	const size_t crlf = this->m_streamBuffer.find("\r\n");
 	if (crlf == std::string::npos)
 		return false;
-	std::cout << this->m_streamBuffer.substr(0, crlf) << std::endl;
 	this->nextCommand = Command(this->m_streamBuffer.substr(0, crlf));
 	this->m_streamBuffer.erase(0, crlf + 2);
 	return true;

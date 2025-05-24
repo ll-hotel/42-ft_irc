@@ -21,7 +21,7 @@ TcpSocket::TcpSocket(TcpSocket &other) : m_fd(other.rawFd())
 	other.m_fd = -1;
 }
 
-static std::string ft_ltoa(int64_t n) throw()
+std::string ft_ltoa(int64_t n)
 {
 	std::stringstream stream;
 	stream << n;

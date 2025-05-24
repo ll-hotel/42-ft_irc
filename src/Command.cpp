@@ -43,9 +43,8 @@ static Command::Id find_id(const std::string &command_name) throw()
 static void parse_args(const std::string &input, size_t pos, std::vector<std::string> &args)
 {
 	while (pos < input.length()) {
-		while (pos < input.length() and input[pos] == ' ')
-			pos += 1;
-		if (pos == input.length())
+		pos = input.find_first_not_of(' ', pos);
+		if (pos >= input.length())
 			break;
 		size_t word_end;
 		if (input[pos] == ':') {
@@ -53,11 +52,9 @@ static void parse_args(const std::string &input, size_t pos, std::vector<std::st
 			pos += 1;
 		}
 		else {
-			word_end = pos;
-			while (word_end < input.length() and word_end != ' ')
-				word_end += 1;
+			word_end = input.find_first_of(' ', pos);
 		}
-		args.push_back(input.substr(pos, word_end));
+		args.push_back(input.substr(pos, word_end - pos));
 		pos = word_end;
 	}
 }
@@ -67,7 +64,7 @@ std::ostream &operator<<(std::ostream &os, const Command &command)
 	os << command.name << ':';
 	for (std::vector<std::string>::const_iterator it = command.args.begin();
 		 it != command.args.end(); it += 1) {
-		os << ' ' << *it;
+		os << ' ' << '"' << *it << '"';
 	}
 	return os;
 }
