@@ -1,23 +1,12 @@
 #pragma once
 
+#include "Channel.hpp"
 #include "Epoll.hpp"
 #include "TcpSocket.hpp"
 #include "User.hpp"
-#include "Channel.hpp"
+#include "reply_info.hpp"
 #include <string>
 #include <vector>
-
-enum NumericReplyCode {
-	RPL_WELCOME = 1,
-	ERR_NEEDMOREPARAMS = 461,
-	ERR_ALREADYREGISTERED = 462,
-	ERR_NONICKNAMEGIVEN = 431,
-	// ERR_ERRONEUSNICKNAME = 432, /* Not used, because we do not have a nickname 'blacklist' */
-	ERR_NICKNAMEINUSE = 433,
-	ERR_NICKCOLLISION = 436,
-	RPL_TOPIC = 332,
-	RPL_NAMREPLY = 353
-};
 
 class Server
 {
@@ -44,4 +33,5 @@ public:
 	std::vector<Channel *>::iterator getChannelByName(const std::string &name) throw();
 	void commandJoin(const Command &command, User &user);
 	void commandNames(const Channel &chan, User &user) const;
+	void commandTopic(const Command &command, User &user);
 };
