@@ -5,6 +5,8 @@
 #include "TcpStream.hpp"
 #include <string>
 
+class Server;
+
 struct User
 {
 	TcpStream stream;
@@ -19,7 +21,9 @@ struct User
 	std::string servername;
 	std::string realname;
 
-	User(const TcpStream &stream, const SocketAddr &addr);
+	const size_t id;
+
+	User(const TcpStream &stream, const SocketAddr &addr, Server &server);
 	~User();
 	bool receive();
 	void send(const std::string &message);
@@ -30,4 +34,7 @@ struct User
 private:
 	std::string m_streamBuffer;
 	std::string m_sendBuffer;
+	Server &m_server;
+
+	static size_t createId() throw();
 };

@@ -5,6 +5,7 @@
 #include "TcpSocket.hpp"
 #include "User.hpp"
 #include "reply_info.hpp"
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -24,6 +25,7 @@ public:
 	~Server();
 	void run();
 	std::vector<User *>::iterator getUserByFd(int fd) throw();
+	std::vector<User *>::iterator getUserById(size_t id) throw();
 	void routine();
 	void processCommand(const Command &command, User &user);
 	std::string getReplyBase(const NumericReplyCode code, const User &user) const;
@@ -36,4 +38,8 @@ public:
 	void commandNames(const Channel &chan, User &user) const;
 	// implement me is_user_op
 	void commandTopic(const Command &command, User &user);
+
+	const std::vector<User *> &getUsers() const;
+	const std::vector<Channel *> &getChannels() const;
+	void cleanChannel();
 };

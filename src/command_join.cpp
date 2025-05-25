@@ -10,8 +10,9 @@ void Server::commandJoin(const Command &command, User &user)
 	const std::string &channel_name = command.args[0];
 	std::vector<Channel *>::iterator channel_it = this->getChannelByName(channel_name);
 	if (channel_it == m_channels.end()) {
-		m_channels.push_back(new Channel(channel_name));
+		m_channels.push_back(new Channel(channel_name, *this));
 		channel_it = m_channels.end() - 1;
+		(*channel_it)->addOp(user.id);
 	}
 	Channel &channel = **channel_it;
 

@@ -28,8 +28,10 @@ extern bool sigint_received;
 
 void Server::run()
 try {
-	while (m_running and not sigint_received)
+	while (m_running and not sigint_received) {
 		routine();
+		cleanChannel();
+	}
 } catch (const std::exception &e) {
 	std::cerr << e.what() << std::endl;
 }
@@ -38,6 +40,14 @@ std::vector<User *>::iterator Server::getUserByFd(int fd) throw()
 {
 	for (size_t i = 0; i < m_users.size(); i++)
 		if (m_users[i]->stream.rawFd() == fd)
+			return m_users.begin() + i;
+	return m_users.end();
+}
+
+std::vector<User *>::iterator Server::getUserById(size_t id) throw()
+{
+	for (size_t i = 0; i < m_users.size(); i++)
+		if (m_users[i]->id == id)
 			return m_users.begin() + i;
 	return m_users.end();
 }
@@ -55,7 +65,7 @@ void Server::routine()
 		std::cerr << event << std::endl;
 		if (event.data.fd == m_socket.rawFd()) {
 			std::pair<TcpStream, SocketAddr> tmp = m_socket.accept();
-			User *user = new User(tmp.first, tmp.second);
+			User *user = new User(tmp.first, tmp.second, *this);
 			m_users.push_back(user);
 			m_epoll.ctlAdd(user->stream.rawFd(), EPOLLIN);
 		}
@@ -249,4 +259,28 @@ std::vector<Channel *>::iterator Server::getChannelByName(const std::string &nam
 			return it;
 	}
 	return m_channels.end();
+}
+
+const std::vector<User *> &Server::getUsers() const
+{
+	return (m_users);
+}
+
+const std::vector<Channel *> &Server::getChannels() const
+{
+	return (m_channels);
+}
+
+void Server::cleanChannel()
+{
+	size_t i = 0;
+	while (i < m_channels.size()) {
+		if (m_channels[i]->ops.size() == 0) {
+			std::cerr << "removing channel " << m_channels[i]->name() << std::endl;
+			delete *(m_channels.begin() + i).base();
+			m_channels.erase(m_channels.begin() + i);
+		}
+		else
+			i++;
+	}
 }

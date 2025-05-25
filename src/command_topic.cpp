@@ -3,9 +3,7 @@
 // implement me
 static bool is_user_op(const User &user, const Channel &channel)
 {
-	(void)user;
-	(void)channel;
-	return true;
+	return channel.ops.find(user.id) != channel.ops.end();
 }
 
 void Server::commandTopic(const Command &command, User &user)

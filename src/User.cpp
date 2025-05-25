@@ -1,10 +1,12 @@
 #include "User.hpp"
+#include "Server.hpp"
 #include "TcpSocket.hpp"
 #include <iostream>
 #include <stdexcept>
 
-User::User(const TcpStream &stream, const SocketAddr &addr)
-	: stream(stream), addr(addr), didPass(false), didNick(false), didUser(false)
+User::User(const TcpStream &stream, const SocketAddr &addr, Server &server)
+	: stream(stream), addr(addr), didPass(false), didNick(false), didUser(false), id(createId()),
+	  m_server(server)
 {
 	std::cerr << "User " << this->stream.rawFd() << " created" << std::endl;
 }
@@ -12,6 +14,9 @@ User::User(const TcpStream &stream, const SocketAddr &addr)
 User::~User()
 {
 	std::cerr << "User " << stream.rawFd() << " deleted" << std::endl;
+	for (size_t i = 0; i < m_server.getChannels().size(); i++) {
+		m_server.getChannels()[i]->removeUser(*this);
+	}
 }
 
 bool User::receive()
@@ -53,4 +58,13 @@ bool User::parseNextCommand()
 bool User::registered() const throw()
 {
 	return didUser and didNick and didPass;
+}
+
+size_t User::createId() throw()
+{
+	static size_t current_id = 0;
+
+	const size_t id = current_id;
+	current_id += 1;
+	return id;
 }
