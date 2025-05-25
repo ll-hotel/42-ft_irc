@@ -1,9 +1,9 @@
 #pragma once
 
+#include "Channel.hpp"
 #include "Epoll.hpp"
 #include "TcpSocket.hpp"
 #include "User.hpp"
-#include "Channel.hpp"
 #include <string>
 #include <vector>
 
@@ -35,13 +35,16 @@ public:
 	~Server();
 	void run();
 	std::vector<User *>::iterator getUserByFd(int fd) throw();
+	std::vector<User *>::iterator getUserByUsername(const std::string &name) throw();
 	void routine();
 	void processCommand(const Command &command, User &user);
 	void reply(const NumericReplyCode code, User &user) const;
+	std::vector<Channel *>::iterator getChannelByName(const std::string &name) throw();
+
 	void commandPass(const Command &command, User &user) const;
 	void commandNick(const Command &command, User &user) const;
 	void commandUser(const Command &command, User &user) const;
-	std::vector<Channel *>::iterator getChannelByName(const std::string &name) throw();
 	void commandJoin(const Command &command, User &user);
 	void commandNames(const Channel &chan, User &user) const;
+	void commandWho(const Command &command, User &user) const;
 };

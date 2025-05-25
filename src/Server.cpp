@@ -42,6 +42,14 @@ std::vector<User *>::iterator Server::getUserByFd(int fd) throw()
 	return m_users.end();
 }
 
+std::vector<User *>::iterator Server::getUserByUsername(const std::string &name) throw()
+{
+	for (size_t i = 0; i < m_users.size(); i++)
+		if (m_users[i]->username == name)
+			return m_users.begin() + i;
+	return m_users.end();
+}
+
 void Server::routine()
 {
 	std::vector<EpollEvent> events(20);

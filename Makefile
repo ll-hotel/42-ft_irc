@@ -11,6 +11,7 @@ SOURCES += Channel.cpp
 SOURCES += Command.cpp
 SOURCES += command_join.cpp
 SOURCES += command_names.cpp
+SOURCES += command_who.cpp
 
 SOURCE_DIR := src
 BUILD_DIR := build
