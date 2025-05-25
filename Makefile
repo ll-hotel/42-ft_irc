@@ -11,6 +11,7 @@ SOURCES += Channel.cpp
 SOURCES += Command.cpp
 SOURCES += command_join.cpp
 SOURCES += command_names.cpp
+SOURCES += command_topic.cpp
 
 SOURCE_DIR := src
 BUILD_DIR := build
@@ -62,3 +63,5 @@ valgrind:
 	make $(NAME)
 	valgrind -q --track-fds=all ./$(NAME) 8080 bocal
 
+
+-include $(DEPENDS)

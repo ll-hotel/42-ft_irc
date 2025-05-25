@@ -31,6 +31,9 @@ static Command::Id find_id(const std::string &command_name) throw()
 	else if (command_name == "JOIN") {
 		return Command::JOIN;
 	}
+	else if (command_name == "TOPIC") {
+		return Command::TOPIC;
+	}
 	return Command::UNKNOWN;
 }
 

@@ -18,6 +18,8 @@ struct Channel
 	const std::string &name() const throw();
 	const std::vector<User *> &users() const throw();
 
+	std::string topic;
+
 private:
 	std::vector<User *> m_users;
 	std::string m_name;

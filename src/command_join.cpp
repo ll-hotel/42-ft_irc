@@ -1,5 +1,5 @@
-#include "Server.hpp"
 #include "Channel.hpp"
+#include "Server.hpp"
 
 void Server::commandJoin(const Command &command, User &user)
 {

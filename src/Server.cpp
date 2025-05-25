@@ -132,13 +132,16 @@ void Server::processCommand(const Command &command, User &user)
 	case Command::JOIN:
 		this->commandJoin(command, user);
 		break;
+	case Command::TOPIC:
+		this->commandTopic(command, user);
+		break;
 	case Command::UNKNOWN:
 	default:
 		break;
 	}
 }
 
-void Server::reply(const NumericReplyCode code, User &user) const
+std::string Server::getReplyBase(const NumericReplyCode code, const User &user) const
 {
 	std::string reply_str;
 	reply_str.push_back(':');
@@ -150,6 +153,13 @@ void Server::reply(const NumericReplyCode code, User &user) const
 		reply_str.push_back('*');
 	else
 		reply_str.append(user.nickname);
+	return (reply_str);
+}
+
+void Server::reply(const NumericReplyCode code, User &user) const
+{
+	std::string reply_str = getReplyBase(code, user);
+
 	reply_str.push_back(' ');
 
 	if (code == ERR_NEEDMOREPARAMS) {
