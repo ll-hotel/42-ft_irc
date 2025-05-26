@@ -4,6 +4,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <stdint.h>
+#include <unistd.h>
 
 Server::Server(uint16_t port, const std::string &password)
 	: m_socket(port), m_epoll(1000), m_password(password), m_running(true), m_hostname("localhost")
@@ -73,23 +74,18 @@ void Server::routine()
 			std::vector<User *>::iterator user_pos = getUserByFd(event.data.fd);
 			if (user_pos == m_users.end()) {
 				std::cerr << "No such client" << std::endl;
+				::close(event.data.fd);
 				m_epoll.ctlDel(event.data.fd);
-				delete *user_pos;
-				m_users.erase(user_pos);
 				continue;
 			}
 			if (event.events & (EPOLLERR | EPOLLHUP)) {
-				m_epoll.ctlDel(event.data.fd);
-				delete *user_pos;
-				m_users.erase(user_pos);
+				this->delUser(user_pos);
 				continue;
 			}
 			User &user = **user_pos;
 			if (event.events & EPOLLIN) {
 				if (!user.receive()) {
-					m_epoll.ctlDel(event.data.fd);
-					delete *user_pos;
-					m_users.erase(user_pos);
+					this->delUser(user_pos);
 					continue;
 				}
 				while (user.parseNextCommand()) {
@@ -104,14 +100,18 @@ void Server::routine()
 						m_epoll.ctlMod(event.data.fd, EPOLLIN);
 				} catch (const std::runtime_error &e) {
 					std::cerr << e.what() << std::endl;
-					m_epoll.ctlDel(event.data.fd);
-					delete *user_pos;
-					m_users.erase(user_pos);
 					continue;
 				}
 			}
 		}
 	}
+}
+
+void Server::delUser(const std::vector<User *>::iterator &user_pos)
+{
+	m_epoll.ctlDel((*user_pos)->stream.rawFd());
+	delete *user_pos;
+	m_users.erase(user_pos);
 }
 
 void Server::processCommand(const Command &command, User &user)

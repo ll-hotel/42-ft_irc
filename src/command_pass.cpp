@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include <iostream>
 
 void Server::commandPass(const Command &command, User &user) const
 {
