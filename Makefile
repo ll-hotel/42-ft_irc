@@ -15,6 +15,7 @@ SOURCES += command_user.cpp
 SOURCES += command_join.cpp
 SOURCES += command_names.cpp
 SOURCES += command_topic.cpp
+SOURCES += command_part.cpp
 
 SOURCE_DIR := src
 BUILD_DIR := build
@@ -64,7 +65,10 @@ run:
 .PHONY: valgrind
 valgrind:
 	make $(NAME)
-	valgrind -q --track-fds=all ./$(NAME) 8080 bocal
+ifeq ("$(port)", "")
+	eval port="8080"
+endif
+	valgrind -q --track-fds=all ./$(NAME) $(port) bocal
 
 
 -include $(DEPENDS)

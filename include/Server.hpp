@@ -38,6 +38,9 @@ public:
 	void commandNames(const Channel &chan, User &user) const;
 	// implement me is_user_op
 	void commandTopic(const Command &command, User &user);
+	void commandPart(const Command &command, User &user);
+	void errNoSuchChannel(const std::string &chan_name, User &user);
+	void errNotOnChannel(const std::string &chan_name, User &user);
 
 	const std::vector<User *> &getUsers() const;
 	const std::vector<Channel *> &getChannels() const;

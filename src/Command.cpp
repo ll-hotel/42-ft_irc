@@ -34,6 +34,9 @@ static Command::Id find_id(const std::string &command_name) throw()
 	else if (command_name == "TOPIC") {
 		return Command::TOPIC;
 	}
+	else if (command_name == "PART") {
+		return Command::PART;
+	}
 	return Command::UNKNOWN;
 }
 

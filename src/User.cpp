@@ -1,12 +1,11 @@
 #include "User.hpp"
-#include "Server.hpp"
 #include "TcpSocket.hpp"
 #include <iostream>
 #include <stdexcept>
 
-User::User(const TcpStream &stream, const SocketAddr &addr, Server &server)
+User::User(const TcpStream &stream, const SocketAddr &addr, Epoll &epoll)
 	: stream(stream), addr(addr), didPass(false), didNick(false), didUser(false), id(createId()),
-	  m_server(server)
+	  m_epoll(epoll)
 {
 	std::cerr << "User " << this->stream.rawFd() << " created" << std::endl;
 }
@@ -14,9 +13,6 @@ User::User(const TcpStream &stream, const SocketAddr &addr, Server &server)
 User::~User()
 {
 	std::cerr << "User " << stream.rawFd() << " deleted" << std::endl;
-	for (size_t i = 0; i < m_server.getChannels().size(); i++) {
-		m_server.getChannels()[i]->removeUser(*this);
-	}
 }
 
 bool User::receive()
@@ -32,6 +28,8 @@ bool User::receive()
 
 void User::send(const std::string &message)
 {
+	if (m_sendBuffer.empty())
+		m_epoll.ctlMod(stream.rawFd(), EPOLLIN | EPOLLOUT);
 	m_sendBuffer += message;
 }
 
@@ -42,6 +40,8 @@ bool User::flush()
 		throw std::runtime_error("Could not send to " + ft_ltoa(this->stream.rawFd()));
 	const bool fully_flushed = (size_t)len == m_sendBuffer.size();
 	m_sendBuffer.erase(0, len);
+	if (fully_flushed)
+		m_epoll.ctlMod(this->stream.rawFd(), EPOLLIN);
 	return (fully_flushed);
 }
 

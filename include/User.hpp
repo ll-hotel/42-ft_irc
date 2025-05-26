@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Command.hpp"
+#include "Epoll.hpp"
 #include "SocketAddr.hpp"
 #include "TcpStream.hpp"
 #include <string>
@@ -20,10 +21,9 @@ struct User
 	std::string hostname;
 	std::string servername;
 	std::string realname;
-
 	const size_t id;
 
-	User(const TcpStream &stream, const SocketAddr &addr, Server &server);
+	User(const TcpStream &stream, const SocketAddr &addr, Epoll &server);
 	~User();
 	bool receive();
 	void send(const std::string &message);
@@ -34,7 +34,7 @@ struct User
 private:
 	std::string m_streamBuffer;
 	std::string m_sendBuffer;
-	Server &m_server;
+	Epoll &m_epoll;
 
 	static size_t createId() throw();
 };

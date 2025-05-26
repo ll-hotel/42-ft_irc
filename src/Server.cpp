@@ -66,7 +66,7 @@ void Server::routine()
 		std::cerr << event << std::endl;
 		if (event.data.fd == m_socket.rawFd()) {
 			std::pair<TcpStream, SocketAddr> tmp = m_socket.accept();
-			User *user = new User(tmp.first, tmp.second, *this);
+			User *user = new User(tmp.first, tmp.second, m_epoll);
 			m_users.push_back(user);
 			m_epoll.ctlAdd(user->stream.rawFd(), EPOLLIN);
 		}
@@ -92,12 +92,10 @@ void Server::routine()
 					std::cerr << user.nextCommand << std::endl;
 					this->processCommand(user.nextCommand, user);
 				}
-				m_epoll.ctlMod(event.data.fd, EPOLLIN | EPOLLOUT);
 			}
 			if (event.events & EPOLLOUT) {
 				try {
-					if (user.flush())
-						m_epoll.ctlMod(event.data.fd, EPOLLIN);
+					user.flush();
 				} catch (const std::runtime_error &e) {
 					std::cerr << e.what() << std::endl;
 					continue;
@@ -144,6 +142,9 @@ void Server::processCommand(const Command &command, User &user)
 		break;
 	case Command::TOPIC:
 		this->commandTopic(command, user);
+		break;
+	case Command::PART:
+		this->commandPart(command, user);
 		break;
 	case Command::UNKNOWN:
 	default:
