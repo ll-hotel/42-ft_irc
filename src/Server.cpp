@@ -194,64 +194,6 @@ void Server::reply(const NumericReplyCode code, User &user) const
 	user.send(reply_str);
 }
 
-void Server::commandPass(const Command &command, User &user) const
-{
-	if (command.args.size() < 1) {
-		this->reply(ERR_NEEDMOREPARAMS, user);
-		return;
-	}
-	if (command.args[0] != m_password)
-		return;
-	if (user.didPass) {
-		this->reply(ERR_ALREADYREGISTERED, user);
-		return;
-	}
-	user.didPass = true;
-	std::cerr << "User " << user.stream.rawFd() << " authenticated" << std::endl;
-}
-
-void Server::commandNick(const Command &command, User &user) const
-{
-	if (command.args.size() < 1) {
-		this->reply(ERR_NONICKNAMEGIVEN, user);
-		return;
-	}
-	const std::string &new_nick = command.args[0];
-	if (user.nickname == new_nick) {
-		this->reply(ERR_NICKNAMEINUSE, user);
-		return;
-	}
-	for (size_t i = 0; i < m_users.size(); i += 1) {
-		if (m_users[i]->nickname == new_nick) {
-			this->reply(ERR_NICKCOLLISION, user);
-			return;
-		}
-	}
-	user.nickname = new_nick;
-	user.didNick = true;
-	if (user.registered())
-		this->reply(RPL_WELCOME, user);
-}
-
-void Server::commandUser(const Command &command, User &user) const
-{
-	if (user.didUser) {
-		this->reply(ERR_ALREADYREGISTERED, user);
-		return;
-	}
-	if (command.args.size() != 4) {
-		this->reply(ERR_NEEDMOREPARAMS, user);
-		return;
-	}
-	user.username = command.args[0];
-	user.hostname = command.args[1];
-	user.servername = command.args[2];
-	user.realname = command.args[3];
-	user.didUser = true;
-	if (user.registered())
-		this->reply(RPL_WELCOME, user);
-}
-
 std::vector<Channel *>::iterator Server::getChannelByName(const std::string &name) throw()
 {
 	for (std::vector<Channel *>::iterator it = m_channels.begin(); it != m_channels.end(); it++) {
