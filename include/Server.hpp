@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Channel.hpp"
+#include "Command.hpp"
 #include "Epoll.hpp"
 #include "TcpSocket.hpp"
 #include "User.hpp"
@@ -41,16 +42,19 @@ public:
 	void commandNick(const Command &command, User &user) const;
 	void commandUser(const Command &command, User &user) const;
 	void commandJoin(const Command &command, User &user);
-	void commandNames(const Channel &chan, User &user) const;
+	void commandNames(const Command &command, User &user) const;
 	// implement me is_user_op
 	void commandTopic(const Command &command, User &user);
 	void commandPart(const Command &command, User &user);
+	void commandPrivMsg(const Command &command, User &user) const;
 	void errNoSuchChannel(const std::string &chan_name, User &user);
 	void errNotOnChannel(const std::string &chan_name, User &user);
-	void commandPrivMsg(const Command &command, User &user) const;
 	void errNoRecipient(User &user, const std::string &cmd) const;
 	void errNoTextToSend(User &user) const;
 	void errNoSuchNick(User &user, const std::string &nick) const;
+	void errNeedMoreParams(User &user, const std::string &cmd) const;
+	void rplEndOfNames(User &user, const std::string &chan) const;
+	void rplNamReply(User &user, const std::string &chan) const;
 
 	const std::vector<User *> &getUsers() const;
 	const std::vector<Channel *> &getChannels() const;

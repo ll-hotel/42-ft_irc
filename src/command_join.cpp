@@ -21,5 +21,5 @@ void Server::commandJoin(const Command &command, User &user)
 	std::string msg = ":" + user.nickname + '!' + user.servername + "@localhost";
 	msg.append(" JOIN " + chan->name() + "\r\n");
 	chan->broadcast(msg);
-	this->commandNames(*chan, user);
+	this->commandNames(Command("NAMES " + chan->name()), user);
 }

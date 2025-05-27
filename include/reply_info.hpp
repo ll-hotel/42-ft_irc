@@ -6,7 +6,8 @@
 #define ERR_NOSUCHNICK_MESSAGE "No such nickname"
 #define ERR_NORECIPIENT_MESSAGE "No recipient given"
 #define ERR_NOTEXTTOSEND_MESSAGE "No text to send"
-
+#define ERR_NEEDMOREPARAMS_MESSAGE "Need more params"
+#define RPL_ENDOFNAMES_MESSAGE "End of /NAMES list"
 #define RPL_NOTOPIC_MESSAGE "No topic is set"
 
 enum NumericReplyCode {
@@ -20,6 +21,7 @@ enum NumericReplyCode {
 	ERR_NICKNAMEINUSE = 433,
 	ERR_NICKCOLLISION = 436,
 	RPL_NAMREPLY = 353,
+	RPL_ENDOFNAMES = 366,
 	ERR_NOTONCHANNEL = 442,
 	ERR_CHANOPRIVSNEEDED = 482,
 	ERR_NOSUCHCHANNEL = 403,

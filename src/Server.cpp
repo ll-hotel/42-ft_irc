@@ -210,6 +210,9 @@ void Server::processCommand(const Command &command, User &user)
 	case Command::PRIVMSG:
 		this->commandPrivMsg(command, user);
 		break;
+	case Command::NAMES:
+		this->commandNames(command, user);
+		break;
 	case Command::UNKNOWN:
 	default:
 		break;

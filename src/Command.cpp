@@ -40,6 +40,9 @@ static Command::Id find_id(const std::string &command_name) throw()
 	else if (command_name == "PRIVMSG") {
 		return Command::PRIVMSG;
 	}
+	else if (command_name == "NAMES") {
+		return Command::NAMES;
+	}
 	return Command::UNKNOWN;
 }
 
