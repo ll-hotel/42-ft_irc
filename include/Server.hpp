@@ -27,6 +27,8 @@ public:
 	std::vector<User *>::iterator getUserById(size_t id) throw();
 	std::vector<Channel *>::iterator getChannelByName(const std::string &name) throw();
 	std::vector<Channel *>::iterator getChannelById(size_t id) throw();
+	std::vector<Channel *>::const_iterator getChannelByName(const std::string &name) const throw();
+	std::vector<User *>::const_iterator getUserbyNickname(const std::string &name) const throw();
 	void routine();
 	void delUser(size_t id);
 	void delChannel(size_t id);
@@ -45,6 +47,10 @@ public:
 	void commandPart(const Command &command, User &user);
 	void errNoSuchChannel(const std::string &chan_name, User &user);
 	void errNotOnChannel(const std::string &chan_name, User &user);
+	void commandPrivMsg(const Command &command, User &user) const;
+	void errNoRecipient(User &user, const std::string &cmd) const;
+	void errNoTextToSend(User &user) const;
+	void errNoSuchNick(User &user, const std::string &nick) const;
 
 	const std::vector<User *> &getUsers() const;
 	const std::vector<Channel *> &getChannels() const;

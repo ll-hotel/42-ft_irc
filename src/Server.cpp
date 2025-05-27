@@ -14,6 +14,15 @@ Server::Server(uint16_t port, const std::string &password)
 
 Server::~Server()
 {
+	m_epoll.ctlDel(m_socket.rawFd());
+	while (not m_users.empty()) {
+		delete m_users.front();
+		m_users.erase(m_users.begin());
+	}
+	while (not m_channels.empty()) {
+		delete m_channels.front();
+		m_channels.erase(m_channels.begin());
+	}
 }
 
 extern bool sigint_received;
@@ -198,6 +207,9 @@ void Server::processCommand(const Command &command, User &user)
 	case Command::PART:
 		this->commandPart(command, user);
 		break;
+	case Command::PRIVMSG:
+		this->commandPrivMsg(command, user);
+		break;
 	case Command::UNKNOWN:
 	default:
 		break;
@@ -289,4 +301,24 @@ void Server::connectUserToChannel(User &user, Channel &chan) const
 	}
 	chan.users.insert(user.id);
 	user.channels.insert(chan.id);
+}
+
+std::vector<Channel *>::const_iterator Server::getChannelByName(const std::string &name) const throw()
+{
+	for (std::vector<Channel *>::const_iterator it = m_channels.begin(); it != m_channels.end();
+		 it++) {
+		if ((*it)->name() == name)
+			return it;
+	}
+	return m_channels.end();
+}
+
+std::vector<User *>::const_iterator Server::getUserbyNickname(const std::string &nick) const throw()
+{
+	for (std::vector<User *>::const_iterator it = m_users.begin(); it != m_users.end();
+		 it++) {
+		if ((*it)->nickname == nick)
+			return it;
+	}
+	return m_users.end();
 }

@@ -16,7 +16,8 @@ struct Channel
 
 	explicit Channel(const std::string &name, Server &server);
 	~Channel();
-	void broadcast(const std::string &msg);
+	void broadcast(const std::string &msg) const;
+	void privmsg(const size_t &user_id, const std::string &msg) const;
 	const std::string &name() const throw();
 
 private:

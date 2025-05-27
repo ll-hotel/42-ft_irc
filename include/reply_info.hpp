@@ -3,6 +3,10 @@
 #define ERR_CHANOPRIVSNEEDED_MESSAGE "You're not channel operator"
 #define ERR_NOTONCHANNEL_MESSAGE "You're not on that channel"
 #define ERR_NOSUCHCHANNEL_MESSAGE "No such channel"
+#define ERR_NOSUCHNICK_MESSAGE "No such nickname"
+#define ERR_NORECIPIENT_MESSAGE "No recipient given"
+#define ERR_NOTEXTTOSEND_MESSAGE "No text to send"
+
 #define RPL_NOTOPIC_MESSAGE "No topic is set"
 
 enum NumericReplyCode {
@@ -18,5 +22,8 @@ enum NumericReplyCode {
 	RPL_NAMREPLY = 353,
 	ERR_NOTONCHANNEL = 442,
 	ERR_CHANOPRIVSNEEDED = 482,
-	ERR_NOSUCHCHANNEL = 403
+	ERR_NOSUCHCHANNEL = 403,
+	ERR_NORECIPIENT = 411,
+	ERR_NOTEXTTOSEND = 412,
+	ERR_NOSUCHNICK = 401
 };

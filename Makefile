@@ -16,6 +16,7 @@ SOURCES += command_join.cpp
 SOURCES += command_names.cpp
 SOURCES += command_topic.cpp
 SOURCES += command_part.cpp
+SOURCES += command_privmsg.cpp
 
 SOURCE_DIR := src
 BUILD_DIR := build
