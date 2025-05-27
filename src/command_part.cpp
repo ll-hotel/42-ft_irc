@@ -21,13 +21,14 @@ void Server::commandPart(const Command &cmd, User &user)
 			this->errNoSuchChannel(*chan_name, user);
 			continue;
 		}
-		if ((*chan_pos)->users().find(user.id) == (*chan_pos)->users().end()) {
+		Channel &chan = *(*chan_pos);
+		if (chan.users.find(user.id) == chan.users.end()) {
 			this->errNotOnChannel(*chan_name, user);
 			continue;
 		}
 		const std::string msg(prefix + *chan_name + reason + "\r\n");
-		(*chan_pos)->broadcast(msg);
-		(*chan_pos)->removeUser(user);
+		chan.broadcast(msg);
+		this->removeChannelUser(chan, user);
 	}
 }
 

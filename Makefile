@@ -26,7 +26,7 @@ DEPENDS := $(patsubst %.o, %.d, $(OBJECTS))
 
 CXX := c++
 CPPFLAGS := -MMD -MP
-CXXFLAGS := -Wall -Wextra -Werror -Wpedantic -std=c++98 -g
+CXXFLAGS := -Wall -Wextra -Werror -Wpedantic -std=c++98 -g -O2
 CXXFLAGS += -Iinclude/
 
 .PHONY: all

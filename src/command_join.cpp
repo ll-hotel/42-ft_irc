@@ -9,16 +9,17 @@ void Server::commandJoin(const Command &command, User &user)
 	}
 	const std::string &channel_name = command.args[0];
 	std::vector<Channel *>::iterator channel_it = this->getChannelByName(channel_name);
+	Channel *chan = NULL;
 	if (channel_it == m_channels.end()) {
-		m_channels.push_back(new Channel(channel_name, *this));
-		channel_it = m_channels.end() - 1;
-		(*channel_it)->addOp(user.id);
+		chan = new Channel(channel_name, *this);
+		m_channels.push_back(chan);
 	}
-	Channel &channel = **channel_it;
-
-	channel.addUser(user);
-	std::string notification = ":" + user.nickname + '!' + user.servername + "@localhost" + ' ' +
-							   "JOIN" + ' ' + channel.name() + "\r\n";
-	channel.broadcast(notification);
-	this->commandNames(channel, user);
+	else {
+		chan = (*channel_it);
+	}
+	this->connectUserToChannel(user, *chan);
+	std::string msg = ":" + user.nickname + '!' + user.servername + "@localhost";
+	msg.append(" JOIN " + chan->name() + "\r\n");
+	chan->broadcast(msg);
+	this->commandNames(*chan, user);
 }

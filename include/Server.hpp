@@ -25,15 +25,19 @@ public:
 	void run();
 	std::vector<User *>::iterator getUserByFd(int fd) throw();
 	std::vector<User *>::iterator getUserById(size_t id) throw();
+	std::vector<Channel *>::iterator getChannelByName(const std::string &name) throw();
+	std::vector<Channel *>::iterator getChannelById(size_t id) throw();
 	void routine();
-	void delUser(const std::vector<User *>::iterator &);
+	void delUser(size_t id);
+	void delChannel(size_t id);
+	void removeChannelUser(Channel &chan, User &user) const;
+	void connectUserToChannel(User &user, Channel &chan) const;
 	void processCommand(const Command &command, User &user);
 	std::string getReplyBase(const NumericReplyCode code, const User &user) const;
 	void reply(const NumericReplyCode code, User &user) const;
 	void commandPass(const Command &command, User &user) const;
 	void commandNick(const Command &command, User &user) const;
 	void commandUser(const Command &command, User &user) const;
-	std::vector<Channel *>::iterator getChannelByName(const std::string &name) throw();
 	void commandJoin(const Command &command, User &user);
 	void commandNames(const Channel &chan, User &user) const;
 	// implement me is_user_op

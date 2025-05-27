@@ -12,7 +12,7 @@ void Server::commandNames(const Channel &chan, User &user) const
 	msg.append(" = ");
 	msg.append(chan.name());
 	msg.append(" :");
-	for (size_t i = 0; i < chan.users().size(); i += 1) {
+	for (size_t i = 0; i < chan.users.size(); i += 1) {
 		msg.append(m_users[i]->nickname);
 		msg.push_back(' ');
 	}

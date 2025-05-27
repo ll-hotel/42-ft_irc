@@ -14,15 +14,6 @@ Server::Server(uint16_t port, const std::string &password)
 
 Server::~Server()
 {
-	for (size_t i = 0; i < m_users.size(); i += 1) {
-		m_epoll.ctlDel(m_users[i]->stream.rawFd());
-		delete m_users[i];
-	}
-	m_users.clear();
-	for (size_t i = 0; i < m_channels.size(); i += 1) {
-		delete m_channels[i];
-	}
-	m_channels.clear();
 }
 
 extern bool sigint_received;
@@ -30,8 +21,8 @@ extern bool sigint_received;
 void Server::run()
 try {
 	while (m_running and not sigint_received) {
-		routine();
-		cleanChannel();
+		this->routine();
+		this->cleanChannel();
 	}
 } catch (const std::exception &e) {
 	std::cerr << e.what() << std::endl;
@@ -69,47 +60,108 @@ void Server::routine()
 			User *user = new User(tmp.first, tmp.second, m_epoll);
 			m_users.push_back(user);
 			m_epoll.ctlAdd(user->stream.rawFd(), EPOLLIN);
+			continue;
 		}
-		else {
-			std::vector<User *>::iterator user_pos = getUserByFd(event.data.fd);
-			if (user_pos == m_users.end()) {
-				std::cerr << "No such client" << std::endl;
-				::close(event.data.fd);
-				m_epoll.ctlDel(event.data.fd);
+		std::vector<User *>::iterator user_pos = getUserByFd(event.data.fd);
+		if (user_pos == m_users.end()) {
+			std::cerr << "No such client" << std::endl;
+			::close(event.data.fd);
+			m_epoll.ctlDel(event.data.fd);
+			continue;
+		}
+		User &user = *(*user_pos);
+		if (event.events & (EPOLLERR | EPOLLHUP)) {
+			this->delUser(user.id);
+			continue;
+		}
+		if (event.events & EPOLLIN) {
+			if (!user.receive()) {
+				this->delUser(user.id);
 				continue;
 			}
-			if (event.events & (EPOLLERR | EPOLLHUP)) {
-				this->delUser(user_pos);
+			while (user.parseNextCommand()) {
+				std::cerr << user.nickname << ": " << user.nextCommand << std::endl;
+				this->processCommand(user.nextCommand, user);
+			}
+		}
+		if (event.events & EPOLLOUT) {
+			try {
+				user.flush();
+			} catch (const std::runtime_error &e) {
+				std::cerr << e.what() << std::endl;
 				continue;
-			}
-			User &user = **user_pos;
-			if (event.events & EPOLLIN) {
-				if (!user.receive()) {
-					this->delUser(user_pos);
-					continue;
-				}
-				while (user.parseNextCommand()) {
-					std::cerr << user.nextCommand << std::endl;
-					this->processCommand(user.nextCommand, user);
-				}
-			}
-			if (event.events & EPOLLOUT) {
-				try {
-					user.flush();
-				} catch (const std::runtime_error &e) {
-					std::cerr << e.what() << std::endl;
-					continue;
-				}
 			}
 		}
 	}
 }
 
-void Server::delUser(const std::vector<User *>::iterator &user_pos)
+void Server::delUser(const size_t id)
 {
-	m_epoll.ctlDel((*user_pos)->stream.rawFd());
-	delete *user_pos;
+	std::vector<User *>::iterator user_pos = this->getUserById(id);
+	if (user_pos == m_users.end()) {
+		std::cerr << "WARN: try to delete invalid User" << std::endl;
+		return;
+	}
+	User *const user_ptr = (*user_pos);
+	if (user_ptr == NULL) {
+		std::cerr << "WARN: try to delete invalid User 'NULL'" << std::endl;
+	}
+	else {
+		User &user = (*user_ptr);
+		m_epoll.ctlDel(user.stream.rawFd());
+		const std::string msg =
+			':' + user.nickname + '!' + user.username + '@' + m_hostname + ' ' + "PART" + ' ';
+
+		while (not user.channels.empty()) {
+			const size_t chan_id = (*user.channels.begin());
+			std::vector<Channel *>::const_iterator const chan_pos = this->getChannelById(chan_id);
+			if (chan_pos == m_channels.end()) {
+				continue;
+			}
+			Channel &chan = *(*chan_pos);
+			this->removeChannelUser(chan, user);
+			chan.broadcast(msg + chan.name() + " :Disconnected\r\n");
+		}
+		delete user_ptr;
+	}
 	m_users.erase(user_pos);
+}
+
+void Server::delChannel(const size_t id)
+{
+	std::vector<Channel *>::iterator chan_pos = this->getChannelById(id);
+	if (chan_pos == m_channels.end()) {
+		std::cerr << "WARN: try to delete invalid chan" << std::endl;
+		return;
+	}
+	Channel *const chan_ptr = (*chan_pos);
+	if (chan_ptr == NULL) {
+		std::cerr << "WARN: try to delete invalid chan 'NULL'" << std::endl;
+	}
+	else {
+		Channel &chan = (*chan_ptr);
+		std::cerr << "Removing channel " << chan.name() << std::endl;
+		delete chan_ptr;
+	}
+	m_channels.erase(chan_pos);
+}
+
+void Server::removeChannelUser(Channel &chan, User &user) const
+{
+	chan.users.erase(user.id);
+	user.channels.erase(chan.id);
+}
+
+std::vector<Channel *>::iterator Server::getChannelById(const size_t id) throw()
+{
+	for (std::vector<Channel *>::iterator chan_it = m_channels.begin(); chan_it != m_channels.end();
+		 chan_it++) {
+		Channel &chan = *(*chan_it);
+		if (chan.id == id) {
+			return chan_it;
+		}
+	}
+	return m_channels.end();
 }
 
 void Server::processCommand(const Command &command, User &user)
@@ -216,14 +268,25 @@ const std::vector<Channel *> &Server::getChannels() const
 
 void Server::cleanChannel()
 {
-	size_t i = 0;
-	while (i < m_channels.size()) {
-		if (m_channels[i]->ops.size() == 0) {
-			std::cerr << "removing channel " << m_channels[i]->name() << std::endl;
-			delete *(m_channels.begin() + i).base();
-			m_channels.erase(m_channels.begin() + i);
+	bool foundEmptyChannel = true;
+	while (foundEmptyChannel) {
+		foundEmptyChannel = false;
+		for (std::vector<Channel *>::iterator chan_it = m_channels.begin();
+			 not foundEmptyChannel and chan_it != m_channels.end(); chan_it++) {
+			Channel &chan = *(*chan_it);
+			if (chan.users.empty()) {
+				this->delChannel(chan.id);
+				foundEmptyChannel = true;
+			}
 		}
-		else
-			i++;
 	}
+}
+
+void Server::connectUserToChannel(User &user, Channel &chan) const
+{
+	if (chan.users.empty() and chan.ops.empty()) {
+		chan.ops.insert(user.id);
+	}
+	chan.users.insert(user.id);
+	user.channels.insert(chan.id);
 }

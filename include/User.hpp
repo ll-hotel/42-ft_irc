@@ -4,6 +4,7 @@
 #include "Epoll.hpp"
 #include "SocketAddr.hpp"
 #include "TcpStream.hpp"
+#include <set>
 #include <string>
 
 class Server;
@@ -22,6 +23,7 @@ struct User
 	std::string servername;
 	std::string realname;
 	const size_t id;
+	std::set<size_t> channels;
 
 	User(const TcpStream &stream, const SocketAddr &addr, Epoll &server);
 	~User();
