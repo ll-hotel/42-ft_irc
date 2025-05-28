@@ -18,6 +18,7 @@ SOURCES += command_topic.cpp
 SOURCES += command_part.cpp
 SOURCES += command_privmsg.cpp
 SOURCES += ft_split.cpp
+SOURCES += utils.cpp
 
 SOURCE_DIR := src
 BUILD_DIR := build
