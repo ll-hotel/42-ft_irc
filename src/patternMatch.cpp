@@ -1,3 +1,4 @@
+#include <ft_split.hpp>
 #include <string>
 
 static bool patternReq(const std::string &pat, const std::string &str, size_t pat_cur,
@@ -23,7 +24,17 @@ static bool patternReq(const std::string &pat, const std::string &str, size_t pa
 	return (str_cur == str.size());
 }
 
+bool patternMatch(const std::vector<std::string> &patterns, const std::string &str)
+{
+	for (size_t i = 0; i < patterns.size(); i++)
+		if (patternReq(patterns[i], str, 0, 0))
+			return (true);
+	return false;
+}
+
 bool patternMatch(const std::string &pat, const std::string &str)
 {
-	return patternReq(pat, str, 0, 0);
+	std::vector<std::string> patterns = ft_split(pat, ',');
+
+	return patternMatch(patterns, str);
 }
