@@ -17,6 +17,7 @@ SOURCES += command_names.cpp
 SOURCES += command_topic.cpp
 SOURCES += command_part.cpp
 SOURCES += command_privmsg.cpp
+SOURCES += command_quit.cpp
 SOURCES += ft_split.cpp
 SOURCES += patternMatch.cpp
 
@@ -71,7 +72,7 @@ valgrind:
 ifeq ("$(port)", "")
 	eval port="8080"
 endif
-	valgrind -q --track-fds=all ./$(NAME) $(port) bocal
+	valgrind -q --track-fds=all ./$(NAME) 8080 bocal
 
 
 -include $(DEPENDS)

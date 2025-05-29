@@ -92,6 +92,8 @@ void Server::routine()
 				std::cerr << user.nickname << ": " << user.nextCommand << std::endl;
 				this->processCommand(user.nextCommand, user);
 			}
+			if (user.quit)
+				this->delUser(user.id);
 		}
 		if (event.events & EPOLLOUT) {
 			try {
@@ -118,8 +120,8 @@ void Server::delUser(const size_t id)
 	else {
 		User &user = (*user_ptr);
 		m_epoll.ctlDel(user.stream.rawFd());
-		const std::string msg =
-			':' + user.nickname + '!' + user.username + '@' + m_hostname + ' ' + "PART" + ' ';
+		const std::string msg = ':' + user.nickname + '!' + user.username + '@' + m_hostname + ' ' +
+								(user.quit ? "QUIT" : "PART") + ' ';
 
 		while (not user.channels.empty()) {
 			const size_t chan_id = (*user.channels.begin());
@@ -129,11 +131,16 @@ void Server::delUser(const size_t id)
 			}
 			Channel &chan = *(*chan_pos);
 			this->removeChannelUser(chan, user);
-			chan.broadcast(msg + chan.name() + " :Disconnected\r\n");
+			std::string sendmsg;
+			if (user.quit)
+				sendmsg = msg + user.quitMessage;
+			else
+				sendmsg = msg + chan.name() + " :Disconnected";
+			chan.broadcast(sendmsg + "\r\n");
 		}
 		delete user_ptr;
+		m_users.erase(user_pos);
 	}
-	m_users.erase(user_pos);
 }
 
 void Server::delChannel(const size_t id)
@@ -212,6 +219,9 @@ void Server::processCommand(const Command &command, User &user)
 		break;
 	case Command::NAMES:
 		this->commandNames(command, user);
+		break;
+	case Command::QUIT:
+		this->commandQuit(command, user);
 		break;
 	case Command::UNKNOWN:
 	default:
@@ -306,7 +316,8 @@ void Server::connectUserToChannel(User &user, Channel &chan) const
 	user.channels.insert(chan.id);
 }
 
-std::vector<Channel *>::const_iterator Server::getChannelByName(const std::string &name) const throw()
+std::vector<Channel *>::const_iterator Server::getChannelByName(const std::string &name) const
+	throw()
 {
 	for (std::vector<Channel *>::const_iterator it = m_channels.begin(); it != m_channels.end();
 		 it++) {
@@ -318,8 +329,7 @@ std::vector<Channel *>::const_iterator Server::getChannelByName(const std::strin
 
 std::vector<User *>::const_iterator Server::getUserbyNickname(const std::string &nick) const throw()
 {
-	for (std::vector<User *>::const_iterator it = m_users.begin(); it != m_users.end();
-		 it++) {
+	for (std::vector<User *>::const_iterator it = m_users.begin(); it != m_users.end(); it++) {
 		if ((*it)->nickname == nick)
 			return it;
 	}

@@ -8,7 +8,7 @@ struct Command
 {
 	std::string name;
 	std::vector<std::string> args;
-	enum Id { UNKNOWN, PASS, NICK, USER, JOIN, TOPIC, PART, PRIVMSG, NAMES } id;
+	enum Id { UNKNOWN, PASS, NICK, USER, JOIN, TOPIC, PART, PRIVMSG, NAMES, QUIT } id;
 
 	explicit Command();
 	explicit Command(const std::string &input);

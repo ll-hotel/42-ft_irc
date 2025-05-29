@@ -42,6 +42,7 @@ public:
 	void commandNick(const Command &command, User &user) const;
 	void commandUser(const Command &command, User &user) const;
 	void commandJoin(const Command &command, User &user);
+	void commandQuit(const Command &command, User &user);
 	void commandNames(const Command &command, User &user) const;
 	// implement me is_user_op
 	void commandTopic(const Command &command, User &user);
