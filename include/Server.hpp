@@ -47,12 +47,14 @@ public:
 	void commandTopic(const Command &command, User &user);
 	void commandPart(const Command &command, User &user);
 	void commandPrivMsg(const Command &command, User &user) const;
-	void errNoSuchChannel(const std::string &chan_name, User &user);
-	void errNotOnChannel(const std::string &chan_name, User &user);
+	void commandKick(const Command &command, User &user) const;
+	void errNoSuchChannel(User &user, const std::string &channel_name) const;
+	void errNotOnChannel(User &user, const std::string &channel_name) const;
 	void errNoRecipient(User &user, const std::string &cmd) const;
 	void errNoTextToSend(User &user) const;
 	void errNoSuchNick(User &user, const std::string &nick) const;
 	void errNeedMoreParams(User &user, const std::string &cmd) const;
+	void errChanOPrivsNeeded(User &user, const std::string &channel_name) const;
 	void rplEndOfNames(User &user, const std::string &chan) const;
 	void rplNamReply(User &user, const std::string &chan) const;
 

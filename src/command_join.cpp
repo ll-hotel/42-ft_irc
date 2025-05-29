@@ -12,7 +12,7 @@ void Server::commandJoin(const Command &command, User &user)
 	}
 	const std::string &channel_name = command.args[0];
 	if (not is_valid_channel_name(channel_name)) {
-		this->errNoSuchChannel(channel_name, user);
+		this->errNoSuchChannel(user, channel_name);
 		return;
 	}
 	std::vector<Channel *>::iterator channel_it = this->getChannelByName(channel_name);
