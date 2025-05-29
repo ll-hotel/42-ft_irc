@@ -46,6 +46,9 @@ static Command::Id find_id(const std::string &command_name) throw()
 	else if (command_name == "KICK") {
 		return Command::KICK;
 	}
+	else if (command_name == "QUIT") {
+		return Command::QUIT;
+	}
 	return Command::UNKNOWN;
 }
 

@@ -24,6 +24,8 @@ struct User
 	std::string realname;
 	const size_t id;
 	std::set<size_t> channels;
+	bool quit;
+	std::string quitMessage;
 
 	User(const TcpStream &stream, const SocketAddr &addr, Epoll &server);
 	~User();

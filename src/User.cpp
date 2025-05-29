@@ -5,7 +5,7 @@
 
 User::User(const TcpStream &stream, const SocketAddr &addr, Epoll &epoll)
 	: stream(stream), addr(addr), didPass(false), didNick(false), didUser(false), id(createId()),
-	  m_epoll(epoll)
+	  quit(false), m_epoll(epoll)
 {
 	std::cerr << "User " << this->stream.rawFd() << " created" << std::endl;
 }
