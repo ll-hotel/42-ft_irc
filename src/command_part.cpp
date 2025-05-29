@@ -17,12 +17,12 @@ void Server::commandPart(const Command &cmd, User &user)
 		 chan_name != chan_names.end(); chan_name++) {
 		std::vector<Channel *>::iterator chan_pos = this->getChannelByName(*chan_name);
 		if (chan_pos == m_channels.end()) {
-			this->errNoSuchChannel(*chan_name, user);
+			this->errNoSuchChannel(user, *chan_name);
 			continue;
 		}
 		Channel &chan = *(*chan_pos);
 		if (chan.users.find(user.id) == chan.users.end()) {
-			this->errNotOnChannel(*chan_name, user);
+			this->errNotOnChannel(user, *chan_name);
 			continue;
 		}
 		const std::string msg(prefix + *chan_name + reason + "\r\n");
@@ -31,23 +31,23 @@ void Server::commandPart(const Command &cmd, User &user)
 	}
 }
 
-void Server::errNoSuchChannel(const std::string &chan_name, User &user)
+void Server::errNoSuchChannel(User &user, const std::string &channel_name) const
 {
 	std::string msg(":" + m_hostname + ' ' + ft_ltoa(ERR_NOSUCHCHANNEL) + ' ');
 	msg.append(user.nickname + "!" + user.username);
 	msg.push_back(' ');
-	msg.append(chan_name);
+	msg.append(channel_name);
 	msg.append(" :" ERR_NOSUCHCHANNEL_MESSAGE);
 	msg.append("\r\n");
 	user.send(msg);
 }
 
-void Server::errNotOnChannel(const std::string &chan_name, User &user)
+void Server::errNotOnChannel(User &user, const std::string &channel_name) const
 {
 	std::string msg(":" + m_hostname + ' ' + ft_ltoa(ERR_NOSUCHCHANNEL) + ' ');
 	msg.append(user.nickname + "!" + user.username);
 	msg.push_back(' ');
-	msg.append(chan_name);
+	msg.append(channel_name);
 	msg.append(" :" ERR_NOTONCHANNEL_MESSAGE);
 	msg.append("\r\n");
 	user.send(msg);
