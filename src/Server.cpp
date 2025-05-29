@@ -213,6 +213,9 @@ void Server::processCommand(const Command &command, User &user)
 	case Command::NAMES:
 		this->commandNames(command, user);
 		break;
+	case Command::KICK:
+		this->commandKick(command, user);
+		break;
 	case Command::UNKNOWN:
 	default:
 		break;

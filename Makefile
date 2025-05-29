@@ -17,6 +17,7 @@ SOURCES += command_names.cpp
 SOURCES += command_topic.cpp
 SOURCES += command_part.cpp
 SOURCES += command_privmsg.cpp
+SOURCES += command_kick.cpp
 SOURCES += ft_split.cpp
 SOURCES += patternMatch.cpp
 

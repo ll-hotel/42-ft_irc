@@ -1,12 +1,13 @@
 #pragma once
 
-#define ERR_CHANOPRIVSNEEDED_MESSAGE "You're not channel operator"
-#define ERR_NOTONCHANNEL_MESSAGE "You're not on that channel"
+#define ERR_CHANOPRIVSNEEDED_MESSAGE "You are not a channel operator"
+#define ERR_NOTONCHANNEL_MESSAGE "You are not on that channel"
 #define ERR_NOSUCHCHANNEL_MESSAGE "No such channel"
 #define ERR_NOSUCHNICK_MESSAGE "No such nickname"
 #define ERR_NORECIPIENT_MESSAGE "No recipient given"
 #define ERR_NOTEXTTOSEND_MESSAGE "No text to send"
 #define ERR_NEEDMOREPARAMS_MESSAGE "Need more params"
+#define ERR_USERNOTINCHANNEL_MESSAGE "User not in channel"
 #define RPL_ENDOFNAMES_MESSAGE "End of /NAMES list"
 #define RPL_NOTOPIC_MESSAGE "No topic is set"
 
@@ -27,5 +28,6 @@ enum NumericReplyCode {
 	ERR_NOSUCHCHANNEL = 403,
 	ERR_NORECIPIENT = 411,
 	ERR_NOTEXTTOSEND = 412,
-	ERR_NOSUCHNICK = 401
+	ERR_NOSUCHNICK = 401,
+	ERR_USERNOTINCHANNEL = 441
 };
