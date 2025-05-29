@@ -30,7 +30,7 @@
 *.exe
 *.out
 *.app
-ft_irc
+ircserv
 
 # Vscode
 .vscode/settings.json

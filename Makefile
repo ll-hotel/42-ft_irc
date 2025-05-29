@@ -1,4 +1,4 @@
-NAME = ft_irc
+NAME = ircserv
 
 SOURCES := main.cpp
 SOURCES += Epoll.cpp
