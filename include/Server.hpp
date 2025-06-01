@@ -28,6 +28,7 @@ public:
 	std::vector<User *>::iterator getUserById(size_t id) throw();
 	std::vector<Channel *>::iterator getChannelByName(const std::string &name) throw();
 	std::vector<Channel *>::iterator getChannelById(size_t id) throw();
+	std::vector<Channel *>::const_iterator getChannelById(size_t id) const throw();
 	std::vector<Channel *>::const_iterator getChannelByName(const std::string &name) const throw();
 	std::vector<User *>::const_iterator getUserbyNickname(const std::string &name) const throw();
 	void routine();
@@ -62,6 +63,8 @@ public:
 	void rplEndOfNames(User &user, const std::string &chan) const;
 	void rplNamReply(User &user, const std::string &chan) const;
 	void rplInviting(User &user, const std::string &nick, const std::string &chan) const;
+	void rplInviteList(User &user, const std::string &chan) const;
+	void rplEndOfInviteList(User &user) const;
 
 	const std::vector<User *> &getUsers() const;
 	const std::vector<Channel *> &getChannels() const;

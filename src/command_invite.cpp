@@ -2,6 +2,20 @@
 
 void Server::commandInvite(const Command &cmd, User &user) const
 {
+	if (cmd.args.size() == 0) {
+		for (std::set<size_t>::const_iterator chan_id = user.inviteList.begin();
+			 chan_id != user.inviteList.end(); chan_id++) {
+			std::vector<Channel *>::const_iterator chan_pos = this->getChannelById(*chan_id);
+			if (chan_pos == m_channels.end()) {
+				continue;
+			}
+			Channel &channel = *(*chan_pos);
+			this->rplInviteList(user, channel.name());
+		}
+		this->rplEndOfInviteList(user);
+		return;
+	}
+
 	if (cmd.args.size() < 2) {
 		this->errNeedMoreParams(user, "INVITE");
 		return;
@@ -28,8 +42,8 @@ void Server::commandInvite(const Command &cmd, User &user) const
 		return;
 	}
 	User &nick_user = *(*nick_user_pos);
-	if (channel.inviteList.find(nick_user.id) == channel.inviteList.end()) {
-		channel.inviteList.insert(nick_user.id);
+	if (nick_user.inviteList.find(channel.id) == nick_user.inviteList.end()) {
+		nick_user.inviteList.insert(channel.id);
 	}
 	this->rplInviting(user, nickname, channel_name);
 	const std::string client = user.nickname + '!' + user.username + '@' + m_hostname;
@@ -41,4 +55,18 @@ void Server::rplInviting(User &user, const std::string &nick, const std::string 
 	const std::string client = user.nickname + '!' + user.username + '@' + m_hostname;
 	user.send(':' + m_hostname + ' ' + ft_ltoa(RPL_INVITING) + ' ' + client + ' ' + nick + ' ' +
 			  channel + "\r\n");
+}
+
+void Server::rplInviteList(User &user, const std::string &channel) const
+{
+	const std::string client = user.nickname + '!' + user.username + '@' + m_hostname;
+	user.send(':' + m_hostname + ' ' + ft_ltoa(RPL_INVITELIST) + ' ' + client + ' ' + channel +
+			  "\r\n");
+}
+
+void Server::rplEndOfInviteList(User &user) const
+{
+	const std::string client = user.nickname + '!' + user.username + '@' + m_hostname;
+	user.send(':' + m_hostname + ' ' + ft_ltoa(RPL_ENDOFINVITELIST) + ' ' + client +
+			  " :" RPL_ENDOFINVITELIST_MESSAGE "\r\n");
 }

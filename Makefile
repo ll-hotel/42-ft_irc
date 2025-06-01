@@ -74,7 +74,7 @@ valgrind:
 ifeq ("$(port)", "")
 	eval port="8080"
 endif
-	valgrind -q --track-fds=all ./$(NAME) 8080 bocal
+	valgrind -q --track-fds=all ./$(NAME) $(port) bocal
 
 
 -include $(DEPENDS)

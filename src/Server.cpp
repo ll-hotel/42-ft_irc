@@ -180,6 +180,18 @@ std::vector<Channel *>::iterator Server::getChannelById(const size_t id) throw()
 	return m_channels.end();
 }
 
+std::vector<Channel *>::const_iterator Server::getChannelById(const size_t id) const throw()
+{
+	for (std::vector<Channel *>::const_iterator chan_it = m_channels.begin(); chan_it != m_channels.end();
+		 chan_it++) {
+		Channel &chan = *(*chan_it);
+		if (chan.id == id) {
+			return chan_it;
+		}
+	}
+	return m_channels.end();
+}
+
 void Server::processCommand(const Command &command, User &user)
 {
 	if (command.id == Command::PASS) {
