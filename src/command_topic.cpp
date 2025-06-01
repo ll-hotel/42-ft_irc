@@ -9,7 +9,7 @@ static bool is_user_op(const User &user, const Channel &channel)
 void Server::commandTopic(const Command &command, User &user)
 {
 	if (command.args.size() == 0) {
-		this->reply(ERR_NEEDMOREPARAMS, user);
+		this->errNeedMoreParams(user, command.name);
 		return;
 	}
 	std::vector<Channel *>::iterator chan_it = this->getChannelByName(command.args[0]);

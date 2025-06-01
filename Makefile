@@ -21,6 +21,7 @@ SOURCES += command_kick.cpp
 SOURCES += command_quit.cpp
 SOURCES += ft_split.cpp
 SOURCES += patternMatch.cpp
+SOURCES += numeric_replies.cpp
 
 SOURCE_DIR := src
 BUILD_DIR := build
@@ -63,17 +64,14 @@ format:
 	find $(SOURCE_DIR) include -name '*.hpp' -or -name '*.cpp' -exec clang-format -i '{}' ';'
 
 .PHONY: run
-run:
-	make $(NAME)
+run: $(NAME)
 	./$(NAME) 8080 bocal
 
 .PHONY: valgrind
-valgrind:
-	make $(NAME)
+valgrind: $(NAME)
 ifeq ("$(port)", "")
 	eval port="8080"
 endif
-	valgrind -q --track-fds=all ./$(NAME) 8080 bocal
-
+	valgrind -q --track-fds=all ./$(NAME) $(port) bocal
 
 -include $(DEPENDS)

@@ -34,6 +34,7 @@ struct User
 	bool flush();
 	bool parseNextCommand();
 	bool registered() const throw();
+	std::string clientName(const std::string &host) const;
 
 private:
 	std::string m_streamBuffer;

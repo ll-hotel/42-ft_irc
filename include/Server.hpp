@@ -36,8 +36,7 @@ public:
 	void removeChannelUser(Channel &chan, User &user) const;
 	void connectUserToChannel(User &user, Channel &chan) const;
 	void processCommand(const Command &command, User &user);
-	std::string getReplyBase(const NumericReplyCode code, const User &user) const;
-	void reply(const NumericReplyCode code, User &user) const;
+
 	void commandPass(const Command &command, User &user) const;
 	void commandNick(const Command &command, User &user) const;
 	void commandUser(const Command &command, User &user) const;
@@ -49,17 +48,23 @@ public:
 	void commandPart(const Command &command, User &user);
 	void commandPrivMsg(const Command &command, User &user) const;
 	void commandKick(const Command &command, User &user) const;
-	void errNoSuchChannel(User &user, const std::string &channel_name) const;
-	void errNotOnChannel(User &user, const std::string &channel_name) const;
+
+	std::string getReplyBase(const NumericReplyCode code, const User &user) const;
+	void errNoSuchChannel(User &user, const std::string &channel) const;
+	void errNotOnChannel(User &user, const std::string &channel) const;
+	void errNeedMoreParams(User &user, const std::string &cmd) const;
+	void errChanOPrivsNeeded(User &user, const std::string &channel) const;
+	void errUserNotInChannel(User &user, const std::string &nick, const std::string &channel) const;
+	void errAlreadyRegistered(User &user) const;
 	void errNoRecipient(User &user, const std::string &cmd) const;
 	void errNoTextToSend(User &user) const;
 	void errNoSuchNick(User &user, const std::string &nick) const;
-	void errNeedMoreParams(User &user, const std::string &cmd) const;
-	void errChanOPrivsNeeded(User &user, const std::string &channel_name) const;
-	void errUserNotInChannel(User &user, const std::string &nick,
-							 const std::string &channel_name) const;
-	void rplEndOfNames(User &user, const std::string &chan) const;
-	void rplNamReply(User &user, const std::string &chan) const;
+	void errNicknameInUse(User &user, const std::string &nick) const;
+	void errNickCollision(User &user, const std::string &nick) const;
+	void rplNamReply(User &user, const char symbol, const std::string &channel,
+					 const std::vector<std::string> &nicks) const;
+	void rplEndOfNames(User &user, const std::string &channel) const;
+	void rplWelcome(User &user) const;
 
 	const std::vector<User *> &getUsers() const;
 	const std::vector<Channel *> &getChannels() const;

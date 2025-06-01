@@ -247,34 +247,6 @@ std::string Server::getReplyBase(const NumericReplyCode code, const User &user) 
 	return (reply_str);
 }
 
-void Server::reply(const NumericReplyCode code, User &user) const
-{
-	std::string reply_str = getReplyBase(code, user);
-
-	reply_str.push_back(' ');
-
-	if (code == ERR_NEEDMOREPARAMS) {
-		reply_str.append(":Need more params");
-	}
-	else if (code == ERR_ALREADYREGISTERED) {
-		reply_str.append(":Already registered");
-	}
-	else if (code == ERR_NONICKNAMEGIVEN) {
-		reply_str.append(":No nickname given");
-	}
-	else if (code == ERR_NICKNAMEINUSE) {
-		reply_str.append(":Nickname already in use");
-	}
-	else if (code == ERR_NICKCOLLISION) {
-		reply_str.append(":Nickname collision");
-	}
-	else if (code == RPL_WELCOME) {
-		reply_str.append(":Welcome to our IRC server!");
-	}
-	reply_str.append("\r\n");
-	user.send(reply_str);
-}
-
 std::vector<Channel *>::iterator Server::getChannelByName(const std::string &name) throw()
 {
 	for (std::vector<Channel *>::iterator it = m_channels.begin(); it != m_channels.end(); it++) {

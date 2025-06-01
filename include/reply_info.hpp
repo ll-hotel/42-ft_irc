@@ -8,8 +8,12 @@
 #define ERR_NOTEXTTOSEND_MESSAGE "No text to send"
 #define ERR_NEEDMOREPARAMS_MESSAGE "Need more params"
 #define ERR_USERNOTINCHANNEL_MESSAGE "User not in channel"
+#define ERR_ALREADYREGISTERED_MESSAGE "Already registered"
+#define ERR_NICKNAMEINUSE_MESSAGE "Nickname already in use"
+#define ERR_NICKCOLLISION_MESSAGE "Nickname collision"
 #define RPL_ENDOFNAMES_MESSAGE "End of /NAMES list"
 #define RPL_NOTOPIC_MESSAGE "No topic is set"
+#define RPL_WELCOME_MESSAGE "Welcome to our IRC server!"
 
 enum NumericReplyCode {
 	RPL_WELCOME = 1,

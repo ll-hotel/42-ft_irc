@@ -7,7 +7,7 @@ static bool is_valid_channel_name(const std::string &name) throw();
 void Server::commandJoin(const Command &command, User &user)
 {
 	if (command.args.size() < 1) {
-		this->reply(ERR_NEEDMOREPARAMS, user);
+		this->errNeedMoreParams(user, command.name);
 		return;
 	}
 	const std::string &channel_name = command.args[0];
@@ -25,10 +25,7 @@ void Server::commandJoin(const Command &command, User &user)
 		chan = (*channel_it);
 	}
 	this->connectUserToChannel(user, *chan);
-	std::string msg = ":" + user.nickname + '!' + user.servername + "@localhost";
-	msg.append(" JOIN " + chan->name() + "\r\n");
-	chan->broadcast(msg);
-	this->commandNames(Command("NAMES " + chan->name()), user);
+	chan->broadcast(':' + user.clientName(m_hostname) + " JOIN " + chan->name() + "\r\n");
 }
 
 static inline bool is_valid_channel_char(const char &c) throw()
