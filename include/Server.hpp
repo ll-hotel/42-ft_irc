@@ -19,6 +19,7 @@ private:
 	std::string m_password;
 	bool m_running;
 	std::string m_hostname;
+	std::set<size_t> m_ops;
 
 public:
 	explicit Server(uint16_t port, const std::string &password);
@@ -43,6 +44,7 @@ public:
 	void commandUser(const Command &command, User &user) const;
 	void commandJoin(const Command &command, User &user);
 	void commandQuit(const Command &command, User &user);
+	void commandMode(const Command &command, User &user);
 	void commandNames(const Command &command, User &user) const;
 	// implement me is_user_op
 	void commandTopic(const Command &command, User &user);
@@ -63,5 +65,7 @@ public:
 
 	const std::vector<User *> &getUsers() const;
 	const std::vector<Channel *> &getChannels() const;
+	const std::set<size_t> &getOps() const;
+	bool isUserOp(const User &user, const Channel &channel);
 	void cleanChannel();
 };

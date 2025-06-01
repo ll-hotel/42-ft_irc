@@ -226,6 +226,9 @@ void Server::processCommand(const Command &command, User &user)
 	case Command::KICK:
 		this->commandKick(command, user);
 		break;
+	case Command::MODE:
+		this->commandMode(command, user);
+		break;
 	case Command::UNKNOWN:
 	default:
 		break;
@@ -292,6 +295,20 @@ const std::vector<User *> &Server::getUsers() const
 const std::vector<Channel *> &Server::getChannels() const
 {
 	return (m_channels);
+}
+
+const std::set<size_t> &Server::getOps() const
+{
+	return this->m_ops;
+}
+
+bool Server::isUserOp(const User &user, const Channel &channel)
+{
+	if (channel.ops.find(user.id) != channel.ops.end())
+		return true;
+	if (this->m_ops.find(user.id) != this->m_ops.end())
+		return true;
+	return false;
 }
 
 void Server::cleanChannel()
