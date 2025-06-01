@@ -226,6 +226,9 @@ void Server::processCommand(const Command &command, User &user)
 	case Command::KICK:
 		this->commandKick(command, user);
 		break;
+	case Command::INVITE:
+		this->commandInvite(command, user);
+		break;
 	case Command::UNKNOWN:
 	default:
 		break;

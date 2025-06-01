@@ -49,6 +49,9 @@ static Command::Id find_id(const std::string &command_name) throw()
 	else if (command_name == "QUIT") {
 		return Command::QUIT;
 	}
+	else if (command_name == "INVITE") {
+		return Command::INVITE;
+	}
 	return Command::UNKNOWN;
 }
 

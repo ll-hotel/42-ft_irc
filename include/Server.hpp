@@ -49,6 +49,7 @@ public:
 	void commandPart(const Command &command, User &user);
 	void commandPrivMsg(const Command &command, User &user) const;
 	void commandKick(const Command &command, User &user) const;
+	void commandInvite(const Command &command, User &user) const;
 	void errNoSuchChannel(User &user, const std::string &channel_name) const;
 	void errNotOnChannel(User &user, const std::string &channel_name) const;
 	void errNoRecipient(User &user, const std::string &cmd) const;
@@ -60,6 +61,7 @@ public:
 							 const std::string &channel_name) const;
 	void rplEndOfNames(User &user, const std::string &chan) const;
 	void rplNamReply(User &user, const std::string &chan) const;
+	void rplInviting(User &user, const std::string &nick, const std::string &chan) const;
 
 	const std::vector<User *> &getUsers() const;
 	const std::vector<Channel *> &getChannels() const;

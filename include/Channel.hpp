@@ -13,6 +13,8 @@ struct Channel
 	std::string topic;
 	std::set<size_t> ops;
 	std::set<size_t> users;
+	bool inviteOnly;
+	std::set<size_t> inviteList;
 
 	explicit Channel(const std::string &name, Server &server);
 	~Channel();

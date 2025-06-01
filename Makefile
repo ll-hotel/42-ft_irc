@@ -19,6 +19,7 @@ SOURCES += command_part.cpp
 SOURCES += command_privmsg.cpp
 SOURCES += command_kick.cpp
 SOURCES += command_quit.cpp
+SOURCES += command_invite.cpp
 SOURCES += ft_split.cpp
 SOURCES += patternMatch.cpp
 

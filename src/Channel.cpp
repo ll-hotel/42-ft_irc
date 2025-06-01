@@ -3,7 +3,7 @@
 #include "User.hpp"
 
 Channel::Channel(const std::string &name, Server &server)
-	: id(createId()), m_server(server), m_name(name)
+	: id(createId()), inviteOnly(false), m_server(server), m_name(name)
 {
 }
 
