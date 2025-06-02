@@ -104,3 +104,72 @@ void Server::rplWelcome(User &user) const
 	user.send(buildNumericReplyBase(RPL_WELCOME, m_hostname, user) + ":" RPL_WELCOME_MESSAGE
 																	 "\r\n");
 }
+
+void Server::errKeySet(User &user, const std::string &channel_name) const
+{
+	std::string msg = this->getReplyBase(ERR_KEYSET, user);
+	msg.append(" ");
+	msg.append(channel_name);
+	msg.append(" :Channel key already set");
+	msg.append("\r\n");
+	user.send(msg);
+}
+
+void Server::errChannelIsFull(User &user, const std::string &channel_name) const
+{
+	std::string msg = this->getReplyBase(ERR_KEYSET, user);
+	msg.append(" ");
+	msg.append(channel_name);
+	msg.append(" :Cannot join channel (+l)");
+	msg.append("\r\n");
+	user.send(msg);
+}
+
+void Server::errBadChannelKey(User &user, const std::string &channel_name) const
+{
+	std::string msg = this->getReplyBase(ERR_UNKNOWNMODE, user);
+
+	msg.append(" ");
+	msg.append(channel_name);
+	msg.append(" :Cannot join channel (+k)");
+	msg.append("\r\n");
+	user.send(msg);
+}
+
+void Server::rplChannelModeIs(User &user, const Channel &channel) const
+{
+	std::string flag = "+";
+	std::string args;
+	std::string msg = ":" + this->m_hostname + " MODE " + (channel).name() + " ";
+
+	if (channel.password_set) {
+		flag += "k";
+		args.append(channel.password);
+		args.append(" ");
+	}
+	if (channel.limit_user != (size_t)(-1)) {
+		flag += "l";
+		args += ft_ltoa(channel.limit_user);
+		args.append(" ");
+	}
+	if (channel.topic_op_only) {
+		flag += "t";
+	}
+	if (channel.invite_only) {
+		flag += "i";
+	}
+	msg += " " + flag + " " + args;
+	user.send(msg + "\r\n");
+}
+
+void Server::errUnknownMode(User &user, const std::string &channel_name, std::string c) const
+{
+	std::string msg = this->getReplyBase(ERR_UNKNOWNMODE, user);
+
+	msg.append(" ");
+	msg.append(c);
+	msg.append(" :is unknown mode char to me for ");
+	msg.append(channel_name);
+	msg.append("\r\n");
+	user.send(msg);
+}

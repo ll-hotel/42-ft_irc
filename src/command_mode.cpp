@@ -80,6 +80,10 @@ void Server::commandMode(const Command &command, User &user)
 		this->errNotOnChannel(user, command.args[0]);
 		return;
 	}
+	if (command.args.size() == 1) {
+		this->rplChannelModeIs(user, **channel);
+		return;
+	}
 	if (!isUserOp(user, **channel)) {
 		this->errChanOPrivsNeeded(user, command.args[0]);
 		// not_op ERR_CHANOPRIVSNEEDED
@@ -188,26 +192,4 @@ std::vector<cmd_type> exec_mode(s_mode &mode, User &user, Channel &channel, Serv
 		mode.cmds.pop();
 	}
 	return valide_cmds;
-}
-
-void Server::errKeySet(User &user, const std::string &channel_name) const
-{
-	std::string msg = this->getReplyBase(ERR_KEYSET, user);
-	msg.append(" ");
-	msg.append(channel_name);
-	msg.append(" :Channel key already set");
-	msg.append("\r\n");
-	user.send(msg);
-}
-
-void Server::errUnknownMode(User &user, const std::string &channel_name, std::string c) const
-{
-	std::string msg = this->getReplyBase(ERR_UNKNOWNMODE, user);
-
-	msg.append(" ");
-	msg.append(c);
-	msg.append(" :is unknown mode char to me for ");
-	msg.append(channel_name);
-	msg.append("\r\n");
-	user.send(msg);
 }

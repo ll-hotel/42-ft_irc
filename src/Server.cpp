@@ -120,8 +120,8 @@ void Server::delUser(const size_t id)
 	else {
 		User &user = (*user_ptr);
 		m_epoll.ctlDel(user.stream.rawFd());
-		const std::string msg = ':' + user.nickname + '!' + user.username + '@' + m_hostname + ' ' +
-								(user.quit ? "QUIT" : "PART") + ' ';
+		const std::string msg =
+			':' + user.nickname + '!' + user.username + '@' + m_hostname + ' ' + "QUIT" + ' ';
 
 		while (not user.channels.empty()) {
 			const size_t chan_id = (*user.channels.begin());

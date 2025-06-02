@@ -24,12 +24,13 @@ enum NumericReplyCode {
 	ERR_NEEDMOREPARAMS = 461,
 	ERR_ALREADYREGISTERED = 462,
 	ERR_NONICKNAMEGIVEN = 431,
-	ERR_KEYSET = 467,		 // todo
-	ERR_NOCHANMODES = 477,	 // todo
-	ERR_UNKNOWNMODE = 472,	 // todo
-	ERR_CHANNELISFULL = 471, // todo
-							 // ERR_ERRONEUSNICKNAME = 432, /* Not used, because we do not have a
-							 // nickname 'blacklist' */
+	ERR_KEYSET = 467,
+	ERR_NOCHANMODES = 477,
+	ERR_UNKNOWNMODE = 472,
+	ERR_CHANNELISFULL = 471,
+	ERR_BADCHANNELKEY = 475,
+	// ERR_ERRONEUSNICKNAME = 432, /* Not used, because we do not have a
+	// nickname 'blacklist' */
 	ERR_NICKNAMEINUSE = 433,
 	ERR_NICKCOLLISION = 436,
 	RPL_NAMREPLY = 353,
