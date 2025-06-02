@@ -34,6 +34,10 @@ void Server::commandJoin(const Command &command, User &user)
 		this->errChannelIsFull(user, chan->name());
 		return;
 	}
+	if (chan->invite_only && user.inviteList.find(chan->id) == user.inviteList.end()) {
+		;
+		return;
+	}
 	this->connectUserToChannel(user, *chan);
 	chan->broadcast(':' + user.clientName(m_hostname) + " JOIN " + chan->name() + "\r\n");
 }
