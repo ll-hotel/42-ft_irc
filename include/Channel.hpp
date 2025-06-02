@@ -13,7 +13,6 @@ struct Channel
 
 	std::set<size_t> ops;
 	std::set<size_t> users;
-	std::set<size_t> invitation_list;
 
 	std::string topic;
 	bool topic_op_only;

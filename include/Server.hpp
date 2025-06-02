@@ -58,6 +58,8 @@ public:
 	void errNoSuchNick(User &user, const std::string &nick) const;
 	void errNeedMoreParams(User &user, const std::string &cmd) const;
 	void errChanOPrivsNeeded(User &user, const std::string &channel_name) const;
+	void errUnknownMode(User &user, const std::string &channel_name, std::string c) const;
+	void errKeySet(User &user, const std::string &channel_name) const;
 	void errUserNotInChannel(User &user, const std::string &nick,
 							 const std::string &channel_name) const;
 	void rplEndOfNames(User &user, const std::string &chan) const;
