@@ -26,6 +26,7 @@ struct User
 	std::set<size_t> channels;
 	bool quit;
 	std::string quitMessage;
+	std::set<size_t> inviteList;
 
 	User(const TcpStream &stream, const SocketAddr &addr, Epoll &server);
 	~User();

@@ -13,6 +13,7 @@
 #define ERR_NICKCOLLISION_MESSAGE "Nickname collision"
 #define RPL_ENDOFNAMES_MESSAGE "End of /NAMES list"
 #define RPL_NOTOPIC_MESSAGE "No topic is set"
+#define RPL_ENDOFINVITELIST_MESSAGE "End of /INVITE list"
 #define RPL_WELCOME_MESSAGE "Welcome to our IRC server!"
 
 enum NumericReplyCode {
@@ -41,5 +42,8 @@ enum NumericReplyCode {
 	ERR_NORECIPIENT = 411,
 	ERR_NOTEXTTOSEND = 412,
 	ERR_NOSUCHNICK = 401,
-	ERR_USERNOTINCHANNEL = 441
+	ERR_USERNOTINCHANNEL = 441,
+	RPL_INVITING = 341,
+	RPL_INVITELIST = 336,
+	RPL_ENDOFINVITELIST = 337
 };
