@@ -3,11 +3,11 @@
 void Server::commandUser(const Command &command, User &user) const
 {
 	if (user.didUser) {
-		this->reply(ERR_ALREADYREGISTERED, user);
+		this->errAlreadyRegistered(user);
 		return;
 	}
 	if (command.args.size() != 4) {
-		this->reply(ERR_NEEDMOREPARAMS, user);
+		this->errNeedMoreParams(user, command.name);
 		return;
 	}
 	user.username = command.args[0];
@@ -16,5 +16,5 @@ void Server::commandUser(const Command &command, User &user) const
 	user.realname = command.args[3];
 	user.didUser = true;
 	if (user.registered())
-		this->reply(RPL_WELCOME, user);
+		this->rplWelcome(user);
 }

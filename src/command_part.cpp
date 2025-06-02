@@ -4,13 +4,11 @@
 void Server::commandPart(const Command &cmd, User &user)
 {
 	if (cmd.args.size() < 1) {
-		this->reply(ERR_NEEDMOREPARAMS, user);
+		this->errNeedMoreParams(user, cmd.name);
 		return;
 	}
-	const std::string source(':' + user.nickname + '!' + user.username + '@' + m_hostname);
-	const std::string action(" PART");
-	const std::string prefix(source + action + ' ');
-	const std::string reason(cmd.args.size() > 1 ? ' ' + cmd.args[1] : "");
+	const std::string prefix = ':' + user.clientName(m_hostname) + " PART ";
+	const std::string reason = (cmd.args.size() > 1 ? ' ' + cmd.args[1] : "");
 
 	std::vector<std::string> chan_names = ft_split(cmd.args[0], ',');
 	for (std::vector<std::string>::const_iterator chan_name = chan_names.begin();
@@ -29,26 +27,4 @@ void Server::commandPart(const Command &cmd, User &user)
 		chan.broadcast(msg);
 		this->removeChannelUser(chan, user);
 	}
-}
-
-void Server::errNoSuchChannel(User &user, const std::string &channel_name) const
-{
-	std::string msg(":" + m_hostname + ' ' + ft_ltoa(ERR_NOSUCHCHANNEL) + ' ');
-	msg.append(user.nickname + "!" + user.username);
-	msg.push_back(' ');
-	msg.append(channel_name);
-	msg.append(" :" ERR_NOSUCHCHANNEL_MESSAGE);
-	msg.append("\r\n");
-	user.send(msg);
-}
-
-void Server::errNotOnChannel(User &user, const std::string &channel_name) const
-{
-	std::string msg(":" + m_hostname + ' ' + ft_ltoa(ERR_NOSUCHCHANNEL) + ' ');
-	msg.append(user.nickname + "!" + user.username);
-	msg.push_back(' ');
-	msg.append(channel_name);
-	msg.append(" :" ERR_NOTONCHANNEL_MESSAGE);
-	msg.append("\r\n");
-	user.send(msg);
 }

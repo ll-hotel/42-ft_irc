@@ -68,3 +68,8 @@ size_t User::createId() throw()
 	current_id += 1;
 	return id;
 }
+
+std::string User::clientName(const std::string &host) const
+{
+	return (this->nickname.empty() ? "*" : this->nickname) + '!' + this->username + '@' + host;
+}
