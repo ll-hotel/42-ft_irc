@@ -78,6 +78,7 @@ public:
 	void errKeySet(User &user, const std::string &channel_name) const;
 	void errChannelIsFull(User &user, const std::string &channel_name) const;
 	void errBadChannelKey(User &user, const std::string &channel_name) const;
+	void errInviteOnlyChan(User &user, const std::string &channel_name) const;
 	void rplChannelModeIs(User &user, const Channel &channel) const;
 
 	const std::vector<User *> &getUsers() const;

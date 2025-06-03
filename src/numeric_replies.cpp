@@ -117,7 +117,7 @@ void Server::errKeySet(User &user, const std::string &channel_name) const
 
 void Server::errChannelIsFull(User &user, const std::string &channel_name) const
 {
-	std::string msg = this->getReplyBase(ERR_KEYSET, user);
+	std::string msg = this->getReplyBase(ERR_CHANNELISFULL, user);
 	msg.append(" ");
 	msg.append(channel_name);
 	msg.append(" :Cannot join channel (+l)");
@@ -127,11 +127,22 @@ void Server::errChannelIsFull(User &user, const std::string &channel_name) const
 
 void Server::errBadChannelKey(User &user, const std::string &channel_name) const
 {
-	std::string msg = this->getReplyBase(ERR_UNKNOWNMODE, user);
+	std::string msg = this->getReplyBase(ERR_BADCHANNELKEY, user);
 
 	msg.append(" ");
 	msg.append(channel_name);
 	msg.append(" :Cannot join channel (+k)");
+	msg.append("\r\n");
+	user.send(msg);
+}
+
+void Server::errInviteOnlyChan(User &user, const std::string &channel_name) const
+{
+	std::string msg = this->getReplyBase(ERR_INVITEONLYCHAN, user);
+
+	msg.append(" ");
+	msg.append(channel_name);
+	msg.append(" :Cannot join channel (+i)");
 	msg.append("\r\n");
 	user.send(msg);
 }

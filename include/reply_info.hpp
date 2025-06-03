@@ -30,6 +30,7 @@ enum NumericReplyCode {
 	ERR_UNKNOWNMODE = 472,
 	ERR_CHANNELISFULL = 471,
 	ERR_BADCHANNELKEY = 475,
+	ERR_INVITEONLYCHAN = 473,
 	// ERR_ERRONEUSNICKNAME = 432, /* Not used, because we do not have a
 	// nickname 'blacklist' */
 	ERR_NICKNAMEINUSE = 433,

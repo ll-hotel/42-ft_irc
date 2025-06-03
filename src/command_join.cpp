@@ -35,7 +35,7 @@ void Server::commandJoin(const Command &command, User &user)
 		return;
 	}
 	if (chan->invite_only && user.inviteList.find(chan->id) == user.inviteList.end()) {
-		;
+		errInviteOnlyChan(user, chan->name());
 		return;
 	}
 	this->connectUserToChannel(user, *chan);
