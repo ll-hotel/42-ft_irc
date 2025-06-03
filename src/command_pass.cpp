@@ -4,13 +4,13 @@
 void Server::commandPass(const Command &command, User &user) const
 {
 	if (command.args.size() < 1) {
-		this->reply(ERR_NEEDMOREPARAMS, user);
+		this->errNeedMoreParams(user, command.name);
 		return;
 	}
 	if (command.args[0] != m_password)
 		return;
 	if (user.didPass) {
-		this->reply(ERR_ALREADYREGISTERED, user);
+		this->errAlreadyRegistered(user);
 		return;
 	}
 	user.didPass = true;

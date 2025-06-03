@@ -10,9 +10,18 @@ class Server;
 struct Channel
 {
 	const size_t id;
-	std::string topic;
+
 	std::set<size_t> ops;
 	std::set<size_t> users;
+	bool inviteOnly;
+
+	std::string topic;
+	bool topic_op_only;
+	std::string password;
+	bool password_set;
+	bool invite_only;
+
+	size_t limit_user;
 
 	explicit Channel(const std::string &name, Server &server);
 	~Channel();

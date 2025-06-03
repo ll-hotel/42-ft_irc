@@ -120,8 +120,8 @@ void Server::delUser(const size_t id)
 	else {
 		User &user = (*user_ptr);
 		m_epoll.ctlDel(user.stream.rawFd());
-		const std::string msg = ':' + user.nickname + '!' + user.username + '@' + m_hostname + ' ' +
-								(user.quit ? "QUIT" : "PART") + ' ';
+		const std::string msg =
+			':' + user.nickname + '!' + user.username + '@' + m_hostname + ' ' + "QUIT" + ' ';
 
 		while (not user.channels.empty()) {
 			const size_t chan_id = (*user.channels.begin());
@@ -180,6 +180,18 @@ std::vector<Channel *>::iterator Server::getChannelById(const size_t id) throw()
 	return m_channels.end();
 }
 
+std::vector<Channel *>::const_iterator Server::getChannelById(const size_t id) const throw()
+{
+	for (std::vector<Channel *>::const_iterator chan_it = m_channels.begin();
+		 chan_it != m_channels.end(); chan_it++) {
+		Channel &chan = *(*chan_it);
+		if (chan.id == id) {
+			return chan_it;
+		}
+	}
+	return m_channels.end();
+}
+
 void Server::processCommand(const Command &command, User &user)
 {
 	if (command.id == Command::PASS) {
@@ -226,6 +238,12 @@ void Server::processCommand(const Command &command, User &user)
 	case Command::KICK:
 		this->commandKick(command, user);
 		break;
+	case Command::INVITE:
+		this->commandInvite(command, user);
+		break;
+	case Command::MODE:
+		this->commandMode(command, user);
+		break;
 	case Command::UNKNOWN:
 	default:
 		break;
@@ -247,34 +265,6 @@ std::string Server::getReplyBase(const NumericReplyCode code, const User &user) 
 	return (reply_str);
 }
 
-void Server::reply(const NumericReplyCode code, User &user) const
-{
-	std::string reply_str = getReplyBase(code, user);
-
-	reply_str.push_back(' ');
-
-	if (code == ERR_NEEDMOREPARAMS) {
-		reply_str.append(":Need more params");
-	}
-	else if (code == ERR_ALREADYREGISTERED) {
-		reply_str.append(":Already registered");
-	}
-	else if (code == ERR_NONICKNAMEGIVEN) {
-		reply_str.append(":No nickname given");
-	}
-	else if (code == ERR_NICKNAMEINUSE) {
-		reply_str.append(":Nickname already in use");
-	}
-	else if (code == ERR_NICKCOLLISION) {
-		reply_str.append(":Nickname collision");
-	}
-	else if (code == RPL_WELCOME) {
-		reply_str.append(":Welcome to our IRC server!");
-	}
-	reply_str.append("\r\n");
-	user.send(reply_str);
-}
-
 std::vector<Channel *>::iterator Server::getChannelByName(const std::string &name) throw()
 {
 	for (std::vector<Channel *>::iterator it = m_channels.begin(); it != m_channels.end(); it++) {
@@ -292,6 +282,20 @@ const std::vector<User *> &Server::getUsers() const
 const std::vector<Channel *> &Server::getChannels() const
 {
 	return (m_channels);
+}
+
+const std::set<size_t> &Server::getOps() const
+{
+	return this->m_ops;
+}
+
+bool Server::isUserOp(const User &user, const Channel &channel)
+{
+	if (channel.ops.find(user.id) != channel.ops.end())
+		return true;
+	if (this->m_ops.find(user.id) != this->m_ops.end())
+		return true;
+	return false;
 }
 
 void Server::cleanChannel()
