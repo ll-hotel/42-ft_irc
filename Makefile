@@ -21,6 +21,7 @@ SOURCES += command_kick.cpp
 SOURCES += command_quit.cpp
 SOURCES += command_invite.cpp
 SOURCES += command_mode.cpp
+SOURCES += command_who.cpp
 SOURCES += ft_split.cpp
 SOURCES += patternMatch.cpp
 SOURCES += numeric_replies.cpp

@@ -99,6 +99,12 @@ void Server::rplEndOfNames(User &user, const std::string &channel) const
 			  " :" RPL_ENDOFNAMES_MESSAGE "\r\n");
 }
 
+void Server::rplEndOfWho(User &user, const std::string &chan) const
+{
+	user.send(buildNumericReplyBase(RPL_ENDOFWHO, m_hostname, user) + chan + " :" + "end of who" +
+			  "\r\n");
+}
+
 void Server::rplWelcome(User &user) const
 {
 	user.send(buildNumericReplyBase(RPL_WELCOME, m_hostname, user) + ":" RPL_WELCOME_MESSAGE
