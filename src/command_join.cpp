@@ -1,5 +1,6 @@
 #include "Channel.hpp"
 #include "Server.hpp"
+#include "utils.hpp"
 #include <cctype>
 
 static bool is_valid_channel_name(const std::string &name) throw();
@@ -10,7 +11,7 @@ void Server::commandJoin(const Command &command, User &user)
 		this->errNeedMoreParams(user, command.name);
 		return;
 	}
-	const std::string &channel_name = command.args[0];
+	const std::string channel_name = strTolower(command.args[0]);
 	if (not is_valid_channel_name(channel_name)) {
 		this->errNoSuchChannel(user, channel_name);
 		return;

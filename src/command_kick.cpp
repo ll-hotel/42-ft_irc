@@ -1,5 +1,6 @@
 #include "Server.hpp"
 #include "ft_split.hpp"
+#include "utils.hpp"
 
 void Server::commandKick(const Command &cmd, User &user) const
 {
@@ -7,7 +8,7 @@ void Server::commandKick(const Command &cmd, User &user) const
 		this->errNeedMoreParams(user, cmd.name);
 		return;
 	}
-	const std::string &channel_name = cmd.args[0];
+	const std::string channel_name = strTolower(cmd.args[0]);
 	std::vector<Channel *>::const_iterator chan_pos = this->getChannelByName(channel_name);
 	if (chan_pos == m_channels.end()) {
 		this->errNoSuchChannel(user, channel_name);

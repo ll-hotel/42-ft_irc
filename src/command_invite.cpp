@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include "utils.hpp"
 
 void Server::commandInvite(const Command &cmd, User &user) const
 {
@@ -20,7 +21,7 @@ void Server::commandInvite(const Command &cmd, User &user) const
 		this->errNeedMoreParams(user, "INVITE");
 		return;
 	}
-	const std::string &channel_name = cmd.args[1];
+	const std::string channel_name = strTolower(cmd.args[1]);
 	std::vector<Channel *>::const_iterator chan_pos = this->getChannelByName(channel_name);
 	if (chan_pos == m_channels.end()) {
 		this->errNoSuchChannel(user, channel_name);

@@ -24,6 +24,7 @@ SOURCES += command_mode.cpp
 SOURCES += ft_split.cpp
 SOURCES += patternMatch.cpp
 SOURCES += numeric_replies.cpp
+SOURCES += utils.cpp
 
 SOURCE_DIR := src
 BUILD_DIR := build

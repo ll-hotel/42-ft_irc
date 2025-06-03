@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include "utils.hpp"
 #include <cstdlib>
 #include <queue>
 #include <string>
@@ -75,9 +76,11 @@ void Server::commandMode(const Command &command, User &user)
 		this->errNeedMoreParams(user, command.name);
 		return;
 	}
-	channel = getChannelByName(command.args[0]);
+	std::string channel_name = strTolower(command.args[0]);
+
+	channel = getChannelByName(channel_name);
 	if (channel == m_channels.end()) {
-		this->errNotOnChannel(user, command.args[0]);
+		this->errNotOnChannel(user, channel_name);
 		return;
 	}
 	if (command.args.size() == 1) {
@@ -85,7 +88,7 @@ void Server::commandMode(const Command &command, User &user)
 		return;
 	}
 	if (!isUserOp(user, **channel)) {
-		this->errChanOPrivsNeeded(user, command.args[0]);
+		this->errChanOPrivsNeeded(user, channel_name);
 		// not_op ERR_CHANOPRIVSNEEDED
 		return;
 	}
