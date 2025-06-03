@@ -151,11 +151,15 @@ void Server::rplChannelModeIs(User &user, const Channel &channel) const
 {
 	std::string flag = "+";
 	std::string args;
-	std::string msg = ":" + this->m_hostname + " MODE " + (channel).name() + " ";
+	std::string msg = this->getReplyBase(RPL_CHANNELMODEIS, user) + " ";
 
 	if (channel.password_set) {
 		flag += "k";
-		args.append(channel.password);
+		if (channel.users.find(user.id) == channel.users.end()) {
+			args.append(channel.password.size(), '*');
+		}
+		else
+			args.append(channel.password);
 		args.append(" ");
 	}
 	if (channel.limit_user != (size_t)(-1)) {
@@ -169,7 +173,7 @@ void Server::rplChannelModeIs(User &user, const Channel &channel) const
 	if (channel.invite_only) {
 		flag += "i";
 	}
-	msg += " " + flag + " " + args;
+	msg += channel.name() + " " + (flag.size() != 1 ? (flag + " " + args) : "");
 	user.send(msg + "\r\n");
 }
 

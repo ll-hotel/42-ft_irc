@@ -100,13 +100,13 @@ void Server::commandMode(const Command &command, User &user)
 	}
 	std::vector<cmd_type> valide_cmds;
 	valide_cmds = exec_mode(mode, user, **channel, *this);
-	std::string msg = ":" + this->m_hostname + " MODE " + (*channel)->name() + " ";
+	std::string msg = ":" + user.clientName(this->m_hostname) + " MODE " + (*channel)->name() + " ";
 	for (size_t cur = 0; cur < valide_cmds.size(); cur++) {
 		std::string reply_msg = valide_cmds[cur].first;
 		for (size_t i = 0; i < valide_cmds[cur].second.size(); i++)
 			reply_msg += " " + valide_cmds[cur].second[i];
 		reply_msg.append("\r\n");
-		user.send(msg + reply_msg);
+		(*channel)->broadcast(msg + reply_msg);
 	}
 }
 
