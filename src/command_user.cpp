@@ -21,5 +21,6 @@ void Server::commandUser(const Command &command, User &user) const
 		this->rplCreated(user);
 		this->rplMyInfo(user);
 		this->rplISupport(user);
+		this->commandMOTD(Command("MOTD"), user);
 	}
 }

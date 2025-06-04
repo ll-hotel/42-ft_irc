@@ -200,7 +200,7 @@ void Server::rplCreated(User &user) const
 
 void Server::rplMyInfo(User &user) const
 {
-	user.send(buildNumericReplyBase(RPL_MYINFO, m_hostname, user) + m_hostname + " v1 o litko\r\n");
+	user.send(buildNumericReplyBase(RPL_MYINFO, m_hostname, user) + m_hostname + " 1.0.0 o litko\r\n");
 }
 
 void Server::rplISupport(User &user) const
@@ -214,4 +214,33 @@ void Server::rplISupport(User &user) const
 			  " "
 			  ":are supported by this server"
 			  "\r\n");
+}
+
+void Server::rplMOTDStart(User &user) const
+{
+	user.send(buildNumericReplyBase(RPL_MOTDSTART, m_hostname, user) + ":- " + m_hostname +
+			  RPL_MOTDSTART_MESSAGE " -\r\n");
+}
+
+void Server::rplMOTD(User &user) const
+{
+	user.send(buildNumericReplyBase(RPL_MOTD, m_hostname, user) +
+	          ":Message of the day! Yay!"
+	          "\r\n");
+}
+
+void Server::rplEndOfMOTD(User &user) const
+{
+	user.send(buildNumericReplyBase(RPL_ENDOFMOTD, m_hostname, user) + RPL_ENDOFMOTD_MESSAGE
+			  "\r\n");
+}
+
+void Server::errNoSuchServer(User &user, const std::string &server) const
+{
+	user.send(buildNumericReplyBase(ERR_NOSUCHSERVER, m_hostname, user) + server + "\r\n");
+}
+
+void Server::errNoMOTD(User &user) const
+{
+	user.send(buildNumericReplyBase(ERR_NOMOTD, m_hostname, user) + ERR_NOMOTD_MESSAGE + "\r\n");
 }

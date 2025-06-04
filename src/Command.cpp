@@ -55,6 +55,9 @@ static Command::Id find_id(const std::string &command_name) throw()
 	else if (command_name == "MODE") {
 		return Command::MODE;
 	}
+	else if (command_name == "MOTD") {
+		return Command::MOTD;
+	}
 	return Command::UNKNOWN;
 }
 

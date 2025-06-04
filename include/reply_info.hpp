@@ -15,6 +15,9 @@
 #define RPL_NOTOPIC_MESSAGE "No topic is set"
 #define RPL_ENDOFINVITELIST_MESSAGE "End of /INVITE list"
 #define RPL_WELCOME_MESSAGE "Welcome to our IRC server!"
+#define RPL_MOTDSTART_MESSAGE "Message of the day"
+#define RPL_ENDOFMOTD_MESSAGE "End of /MOTD command."
+#define ERR_NOMOTD_MESSAGE "No message of the day."
 
 enum NumericReplyCode {
 	RET_ZERO = 0,
@@ -50,5 +53,10 @@ enum NumericReplyCode {
 	ERR_USERNOTINCHANNEL = 441,
 	RPL_INVITING = 341,
 	RPL_INVITELIST = 336,
-	RPL_ENDOFINVITELIST = 337
+	RPL_ENDOFINVITELIST = 337,
+	RPL_MOTDSTART = 375,
+	RPL_MOTD = 372,
+	RPL_ENDOFMOTD = 376,
+	ERR_NOSUCHSERVER = 402,
+	ERR_NOMOTD = 422
 };

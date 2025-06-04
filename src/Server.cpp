@@ -7,7 +7,7 @@
 #include <ctime>
 
 Server::Server(uint16_t port, const std::string &password)
-	: m_socket(port), m_epoll(1000), m_password(password), m_running(true), m_hostname("localhost")
+	: m_socket(port), m_epoll(1000), m_password(password), m_running(true), m_hostname("ft_irc")
 {
 	{
 		const time_t timer = std::time(0);
@@ -250,6 +250,9 @@ void Server::processCommand(const Command &command, User &user)
 		break;
 	case Command::MODE:
 		this->commandMode(command, user);
+		break;
+	case Command::MOTD:
+		this->commandMOTD(command, user);
 		break;
 	case Command::UNKNOWN:
 	default:
