@@ -41,7 +41,7 @@ public:
 	void connectUserToChannel(User &user, Channel &chan) const;
 	void processCommand(const Command &command, User &user);
 
-	void commandPass(const Command &command, User &user) const;
+	void commandPass(const Command &command, User &user);
 	void commandNick(const Command &command, User &user) const;
 	void commandUser(const Command &command, User &user) const;
 	void commandJoin(const Command &command, User &user);
