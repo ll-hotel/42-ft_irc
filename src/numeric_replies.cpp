@@ -101,8 +101,8 @@ void Server::rplEndOfNames(User &user, const std::string &channel) const
 
 void Server::rplEndOfWho(User &user, const std::string &chan) const
 {
-	user.send(buildNumericReplyBase(RPL_ENDOFWHO, m_hostname, user) + chan + " :" + "end of who" +
-			  "\r\n");
+	user.send(buildNumericReplyBase(RPL_ENDOFWHO, m_hostname, user) + chan + " :" +
+			  "End of WHO list" + "\r\n");
 }
 
 void Server::rplWelcome(User &user) const

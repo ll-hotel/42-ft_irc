@@ -40,7 +40,17 @@ void Server::commandWho(const Command &command, User &user) const
 		}
 	}
 	else {
-		this->rplEndOfWho(user, mask);
+		std::vector<User *>::const_iterator u_it = this->m_users.begin();
+		std::vector<User *>::const_iterator u_end = this->m_users.end();
+		while (u_it != u_end) {
+			if (patternMatch(mask, (*u_it)->nickname) || patternMatch(mask, (*u_it)->hostname) ||
+				patternMatch(mask, (*u_it)->username)) {
+				if (!op_only || this->m_ops.find((*u_it)->id) != this->m_ops.end()) {
+					user_list.push_back(*u_it);
+				}
+			}
+			u_it++;
+		}
 	}
 
 	std::string msg = getReplyBase(RPL_WHOREPLY, user) + " " + mask + " ";
@@ -50,11 +60,9 @@ void Server::commandWho(const Command &command, User &user) const
 			u->username + " " + u->hostname + " " + u->servername + " " + u->nickname + " " + "H";
 		if (this->m_ops.find(u->id) != this->m_ops.end())
 			msg_end += "*";
-		else
-			msg_end += " ";
 		if (chan_ops.find(u->id) != chan_ops.end())
-			msg_end += "@ ";
-		msg_end += ":0 " + u->realname;
+			msg_end += "@";
+		msg_end += " :0 " + u->realname;
 		user.send(msg + msg_end + "\n\r");
 	}
 	this->rplEndOfWho(user, mask);
