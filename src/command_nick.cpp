@@ -19,6 +19,11 @@ void Server::commandNick(const Command &command, User &user) const
 	}
 	user.nickname = new_nick;
 	user.didNick = true;
-	if (user.registered())
+	if (user.registered()) {
 		this->rplWelcome(user);
+		this->rplYourHost(user);
+		this->rplCreated(user);
+		this->rplMyInfo(user);
+		this->rplISupport(user);
+	}
 }

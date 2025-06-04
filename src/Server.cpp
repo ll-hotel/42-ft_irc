@@ -4,11 +4,18 @@
 #include <iostream>
 #include <stdexcept>
 #include <stdint.h>
-#include <unistd.h>
+#include <ctime>
 
 Server::Server(uint16_t port, const std::string &password)
 	: m_socket(port), m_epoll(1000), m_password(password), m_running(true), m_hostname("localhost")
 {
+	{
+		const time_t timer = std::time(0);
+		struct tm *timeinfo = std::localtime(&timer);
+		char buf[128];
+		size_t len = strftime(buf, sizeof(buf), "%d %B %Y", timeinfo);
+		m_created = std::string(buf, len);
+	}
 	m_epoll.ctlAdd(m_socket.rawFd(), EPOLLIN);
 }
 

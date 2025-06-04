@@ -2,6 +2,7 @@
 #include "Server.hpp"
 #include "User.hpp"
 #include "reply_info.hpp"
+#include <bits/types/struct_timeval.h>
 #include <string>
 
 static std::string buildNumericReplyBase(const NumericReplyCode &code, const std::string &host,
@@ -183,4 +184,34 @@ void Server::errUnknownMode(User &user, const std::string &channel_name, std::st
 	msg.append(channel_name);
 	msg.append("\r\n");
 	user.send(msg);
+}
+
+void Server::rplYourHost(User &user) const
+{
+	user.send(buildNumericReplyBase(RPL_YOURHOST, m_hostname, user) + ":Your host is " +
+			  m_hostname + "\r\n");
+}
+
+void Server::rplCreated(User &user) const
+{
+	user.send(buildNumericReplyBase(RPL_CREATED, m_hostname, user) +
+			  ":This server was created on " + m_created + "\r\n");
+}
+
+void Server::rplMyInfo(User &user) const
+{
+	user.send(buildNumericReplyBase(RPL_MYINFO, m_hostname, user) + m_hostname + " v1 o litko\r\n");
+}
+
+void Server::rplISupport(User &user) const
+{
+	user.send(buildNumericReplyBase(RPL_ISUPPORT, m_hostname, user) +
+			  "CASEMAPPING=ascii "
+			  "-CHANLIMIT "
+			  "MODES=l,i,t,k,o "
+			  "NETWORK=" +
+			  m_hostname +
+			  " "
+			  ":are supported by this server"
+			  "\r\n");
 }

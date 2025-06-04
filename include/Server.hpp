@@ -20,6 +20,7 @@ private:
 	bool m_running;
 	std::string m_hostname;
 	std::set<size_t> m_ops;
+	std::string m_created;
 
 public:
 	explicit Server(uint16_t port, const std::string &password);
@@ -80,6 +81,10 @@ public:
 	void errBadChannelKey(User &user, const std::string &channel_name) const;
 	void errInviteOnlyChan(User &user, const std::string &channel_name) const;
 	void rplChannelModeIs(User &user, const Channel &channel) const;
+	void rplYourHost(User &user) const;
+	void rplCreated(User &user) const;
+	void rplMyInfo(User &user) const;
+	void rplISupport(User &user) const;
 
 	const std::vector<User *> &getUsers() const;
 	const std::vector<Channel *> &getChannels() const;
