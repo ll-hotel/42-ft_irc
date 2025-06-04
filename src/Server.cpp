@@ -254,6 +254,9 @@ void Server::processCommand(const Command &command, User &user)
 	case Command::MOTD:
 		this->commandMOTD(command, user);
 		break;
+	case Command::PING:
+		this->commandPing(command, user);
+		break;
 	case Command::UNKNOWN:
 	default:
 		break;

@@ -22,7 +22,8 @@ struct Command
 		KICK,
 		MODE,
 		INVITE,
-		MOTD
+		MOTD,
+		PING
 	} id;
 
 	explicit Command();

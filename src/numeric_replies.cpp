@@ -242,5 +242,10 @@ void Server::errNoSuchServer(User &user, const std::string &server) const
 
 void Server::errNoMOTD(User &user) const
 {
-	user.send(buildNumericReplyBase(ERR_NOMOTD, m_hostname, user) + ERR_NOMOTD_MESSAGE + "\r\n");
+	user.send(buildNumericReplyBase(ERR_NOMOTD, m_hostname, user) + ERR_NOMOTD_MESSAGE "\r\n");
+}
+
+void Server::errNoOrigin(User &user) const
+{
+	user.send(buildNumericReplyBase(ERR_NOORIGIN, m_hostname, user) + ERR_NOORIGIN_MESSAGE "\r\n");
 }

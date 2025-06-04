@@ -18,6 +18,7 @@
 #define RPL_MOTDSTART_MESSAGE "Message of the day"
 #define RPL_ENDOFMOTD_MESSAGE "End of /MOTD command."
 #define ERR_NOMOTD_MESSAGE "No message of the day."
+#define ERR_NOORIGIN_MESSAGE "No message of the day."
 
 enum NumericReplyCode {
 	RET_ZERO = 0,
@@ -58,5 +59,6 @@ enum NumericReplyCode {
 	RPL_MOTD = 372,
 	RPL_ENDOFMOTD = 376,
 	ERR_NOSUCHSERVER = 402,
-	ERR_NOMOTD = 422
+	ERR_NOMOTD = 422,
+	ERR_NOORIGIN = 409
 };

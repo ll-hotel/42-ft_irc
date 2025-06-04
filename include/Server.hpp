@@ -50,6 +50,7 @@ public:
 	void commandKick(const Command &command, User &user) const;
 	void commandInvite(const Command &command, User &user) const;
 	void commandMOTD(const Command &command, User &user) const;
+	void commandPing(const Command &command, User &user) const;
 
 	std::string getReplyBase(const NumericReplyCode code, const User &user) const;
 	void errNeedMoreParams(User &user, const std::string &cmd) const;
@@ -70,6 +71,7 @@ public:
 	void errInviteOnlyChan(User &user, const std::string &channel_name) const;
 	void errNoSuchServer(User &user, const std::string &serv) const;
 	void errNoMOTD(User &user) const;
+	void errNoOrigin(User &user) const;
 
 	void rplEndOfNames(User &user, const std::string &chan) const;
 	void rplNamReply(User &user, const std::string &chan) const;
