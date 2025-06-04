@@ -18,7 +18,7 @@ void Server::commandWho(const Command &command, User &user) const
 	if (mask == "*") {
 		user_list = this->m_users;
 	}
-	else if (mask[0] == '#') {
+	else if (mask[0] == '#' || mask[0] == '&') {
 		mask = strTolower(mask);
 		std::vector<Channel *>::const_iterator chan_it = this->getChannelByName(mask);
 		if (chan_it == this->m_channels.end()) {
