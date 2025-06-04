@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include "utils.hpp"
 #include <cstdlib>
 #include <queue>
 #include <string>
@@ -75,9 +76,11 @@ void Server::commandMode(const Command &command, User &user)
 		this->errNeedMoreParams(user, command.name);
 		return;
 	}
-	channel = getChannelByName(command.args[0]);
+	std::string channel_name = strTolower(command.args[0]);
+
+	channel = getChannelByName(channel_name);
 	if (channel == m_channels.end()) {
-		this->errNotOnChannel(user, command.args[0]);
+		this->errNotOnChannel(user, channel_name);
 		return;
 	}
 	if (command.args.size() == 1) {
@@ -85,7 +88,7 @@ void Server::commandMode(const Command &command, User &user)
 		return;
 	}
 	if (!isUserOp(user, **channel)) {
-		this->errChanOPrivsNeeded(user, command.args[0]);
+		this->errChanOPrivsNeeded(user, channel_name);
 		// not_op ERR_CHANOPRIVSNEEDED
 		return;
 	}
@@ -100,13 +103,13 @@ void Server::commandMode(const Command &command, User &user)
 	}
 	std::vector<cmd_type> valide_cmds;
 	valide_cmds = exec_mode(mode, user, **channel, *this);
-	std::string msg = ":" + this->m_hostname + " MODE " + (*channel)->name() + " ";
+	std::string msg = ":" + user.clientName(this->m_hostname) + " MODE " + (*channel)->name() + " ";
 	for (size_t cur = 0; cur < valide_cmds.size(); cur++) {
 		std::string reply_msg = valide_cmds[cur].first;
 		for (size_t i = 0; i < valide_cmds[cur].second.size(); i++)
 			reply_msg += " " + valide_cmds[cur].second[i];
 		reply_msg.append("\r\n");
-		user.send(msg + reply_msg);
+		(*channel)->broadcast(msg + reply_msg);
 	}
 }
 

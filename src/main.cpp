@@ -41,7 +41,7 @@ static int error(const std::string &exec_file_name, int cause)
 	else if (cause == 1)
 		std::cerr << "'port' need to be a number:" << std::endl;
 	std::cerr << "\t" + exec_file_name + " <port> <password>" << std::endl;
-	return (1);
+	return (2);
 }
 
 static void sigint_handler(int)

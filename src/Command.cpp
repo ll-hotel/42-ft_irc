@@ -1,4 +1,5 @@
 #include "Command.hpp"
+#include "utils.hpp"
 #include <string>
 
 Command::Command() : name(), args(), id(UNKNOWN)
@@ -11,6 +12,7 @@ static void parse_args(const std::string &input, size_t pos, std::vector<std::st
 Command::Command(const std::string &input) : name(), args(), id(UNKNOWN)
 {
 	name = input.substr(0, input.find(' '));
+	this->name = strToupper(this->name);
 	this->id = find_id(this->name);
 	if (this->id == Command::UNKNOWN)
 		return;
@@ -54,6 +56,9 @@ static Command::Id find_id(const std::string &command_name) throw()
 	}
 	else if (command_name == "MODE") {
 		return Command::MODE;
+	}
+	else if (command_name == "WHO") {
+		return Command::WHO;
 	}
 	return Command::UNKNOWN;
 }

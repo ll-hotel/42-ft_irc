@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include "utils.hpp"
 
 void Server::commandTopic(const Command &command, User &user)
 {
@@ -6,11 +7,12 @@ void Server::commandTopic(const Command &command, User &user)
 		this->errNeedMoreParams(user, command.name);
 		return;
 	}
-	std::vector<Channel *>::iterator chan_it = this->getChannelByName(command.args[0]);
 
+	std::string channel_name = strTolower(command.args[0]);
+	std::vector<Channel *>::iterator chan_it = this->getChannelByName(channel_name);
 	std::string rply;
 	if (chan_it == m_channels.end()) {
-		this->errNotOnChannel(user, command.args[0]);
+		this->errNotOnChannel(user, channel_name);
 		return;
 	}
 	else if (command.args.size() == 2) {

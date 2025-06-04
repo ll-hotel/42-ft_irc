@@ -21,7 +21,8 @@ struct Command
 		QUIT,
 		KICK,
 		MODE,
-		INVITE
+		INVITE,
+		WHO
 	} id;
 
 	explicit Command();

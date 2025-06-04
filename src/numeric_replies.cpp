@@ -99,6 +99,12 @@ void Server::rplEndOfNames(User &user, const std::string &channel) const
 			  " :" RPL_ENDOFNAMES_MESSAGE "\r\n");
 }
 
+void Server::rplEndOfWho(User &user, const std::string &chan) const
+{
+	user.send(buildNumericReplyBase(RPL_ENDOFWHO, m_hostname, user) + chan + " :" + "end of who" +
+			  "\r\n");
+}
+
 void Server::rplWelcome(User &user) const
 {
 	user.send(buildNumericReplyBase(RPL_WELCOME, m_hostname, user) + ":" RPL_WELCOME_MESSAGE
@@ -151,11 +157,15 @@ void Server::rplChannelModeIs(User &user, const Channel &channel) const
 {
 	std::string flag = "+";
 	std::string args;
-	std::string msg = ":" + this->m_hostname + " MODE " + (channel).name() + " ";
+	std::string msg = this->getReplyBase(RPL_CHANNELMODEIS, user) + " ";
 
 	if (channel.password_set) {
 		flag += "k";
-		args.append(channel.password);
+		if (channel.users.find(user.id) == channel.users.end()) {
+			args.append(channel.password.size(), '*');
+		}
+		else
+			args.append(channel.password);
 		args.append(" ");
 	}
 	if (channel.limit_user != (size_t)(-1)) {
@@ -169,7 +179,7 @@ void Server::rplChannelModeIs(User &user, const Channel &channel) const
 	if (channel.invite_only) {
 		flag += "i";
 	}
-	msg += " " + flag + " " + args;
+	msg += channel.name() + " " + (flag.size() != 1 ? (flag + " " + args) : "");
 	user.send(msg + "\r\n");
 }
 

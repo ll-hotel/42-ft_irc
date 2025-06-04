@@ -25,7 +25,9 @@ public:
 	explicit Server(uint16_t port, const std::string &password);
 	~Server();
 	void run();
+	std::vector<User *>::const_iterator getUserByFd(int fd) const throw();
 	std::vector<User *>::iterator getUserByFd(int fd) throw();
+	std::vector<User *>::const_iterator getUserById(size_t id) const throw();
 	std::vector<User *>::iterator getUserById(size_t id) throw();
 	std::vector<Channel *>::iterator getChannelByName(const std::string &name) throw();
 	std::vector<Channel *>::iterator getChannelById(size_t id) throw();
@@ -46,11 +48,11 @@ public:
 	void commandQuit(const Command &command, User &user);
 	void commandMode(const Command &command, User &user);
 	void commandNames(const Command &command, User &user) const;
-	// implement me is_user_op
 	void commandTopic(const Command &command, User &user);
 	void commandPart(const Command &command, User &user);
 	void commandPrivMsg(const Command &command, User &user) const;
 	void commandKick(const Command &command, User &user) const;
+	void commandWho(const Command &command, User &user) const;
 
 	std::string getReplyBase(const NumericReplyCode code, const User &user) const;
 	void errNeedMoreParams(User &user, const std::string &cmd) const;
@@ -65,6 +67,7 @@ public:
 	void errNoSuchNick(User &user, const std::string &nick) const;
 
 	void rplEndOfNames(User &user, const std::string &chan) const;
+	void rplEndOfWho(User &user, const std::string &chan) const;
 	void rplNamReply(User &user, const std::string &chan) const;
 	void rplInviting(User &user, const std::string &nick, const std::string &chan) const;
 	void rplInviteList(User &user, const std::string &chan) const;
@@ -84,6 +87,6 @@ public:
 	const std::vector<User *> &getUsers() const;
 	const std::vector<Channel *> &getChannels() const;
 	const std::set<size_t> &getOps() const;
-	bool isUserOp(const User &user, const Channel &channel);
+	bool isUserOp(const User &user, const Channel &channel) const;
 	void cleanChannel();
 };
