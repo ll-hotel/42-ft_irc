@@ -194,3 +194,14 @@ void Server::errUnknownMode(User &user, const std::string &channel_name, std::st
 	msg.append("\r\n");
 	user.send(msg);
 }
+
+void Server::rplNoTopic(User &user, const std::string &channel) const
+{
+	user.send(buildNumericReplyBase(RPL_NOTOPIC, m_hostname, user) + channel +
+			  " :" RPL_NOTOPIC_MESSAGE "\r\n");
+}
+
+void Server::rplTopic(User &user, const std::string &channel, const std::string &topic) const
+{
+	user.send(buildNumericReplyBase(RPL_TOPIC, m_hostname, user) + channel + " :" + topic + "\r\n");
+}

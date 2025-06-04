@@ -83,6 +83,8 @@ public:
 	void errBadChannelKey(User &user, const std::string &channel_name) const;
 	void errInviteOnlyChan(User &user, const std::string &channel_name) const;
 	void rplChannelModeIs(User &user, const Channel &channel) const;
+	void rplNoTopic(User &user, const std::string &channel) const;
+	void rplTopic(User &user, const std::string &channel, const std::string &topic) const;
 
 	const std::vector<User *> &getUsers() const;
 	const std::vector<Channel *> &getChannels() const;
