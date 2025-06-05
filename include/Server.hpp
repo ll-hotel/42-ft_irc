@@ -67,6 +67,8 @@ public:
 	void errNoSuchNick(User &user, const std::string &nick) const;
 
 	void rplEndOfNames(User &user, const std::string &chan) const;
+	void rplWhoReply(User &client, const User &user, const std::string &chan,
+					 const std::set<size_t> &ops) const;
 	void rplEndOfWho(User &user, const std::string &chan) const;
 	void rplNamReply(User &user, const std::string &chan) const;
 	void rplInviting(User &user, const std::string &nick, const std::string &chan) const;

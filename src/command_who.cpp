@@ -1,69 +1,79 @@
 #include "Server.hpp"
 #include "utils.hpp"
 
-void Server::commandWho(const Command &command, User &user) const
+static std::vector<User *> channelUsers(const Channel &channel, const Server &server,
+										const bool op_only);
+static std::vector<User *> matchingUsers(const std::string &pattern,
+										 const std::vector<User *> &users,
+										 const std::set<size_t> &ops, const bool op_only);
+
+void Server::commandWho(const Command &command, User &client) const
 {
+	const bool op_only = (command.args.size() > 1 && command.args[1] == "o");
+	std::string mask = (command.args.empty() ? "*" : command.args[0]);
+
 	std::vector<User *> user_list;
-	std::string mask;
-
-	bool op_only = false;
-	if (command.args.size() > 1 && command.args[1] == "o")
-		op_only = true;
-	if (command.args.size() == 0)
-		mask = "*";
-	else
-		mask = command.args[0];
-
-	std::set<size_t> chan_ops;
+	std::set<size_t> channel_ops;
 	if (mask == "*") {
-		user_list = this->m_users;
+		user_list = m_users;
 	}
 	else if (mask[0] == '#' || mask[0] == '&') {
 		mask = strTolower(mask);
 		std::vector<Channel *>::const_iterator chan_it = this->getChannelByName(mask);
-		if (chan_it == this->m_channels.end()) {
-			this->errNoSuchChannel(user, mask);
+		if (chan_it == m_channels.end()) {
+			this->errNoSuchChannel(client, mask);
 			return;
 		}
-		std::set<size_t>::iterator u_it = (**chan_it).users.begin();
-		std::set<size_t>::iterator u_end = (**chan_it).users.end();
-		while (u_it != u_end) {
-			std::vector<User *>::const_iterator u = getUserById(*u_it);
-			if (u != m_users.end()) {
-				if (!op_only || isUserOp(**u, **chan_it)) {
-					user_list.push_back(*u);
-				}
-				if ((*chan_it)->ops.find(*u_it) != (*chan_it)->ops.end())
-					chan_ops.insert(*u_it);
+		const Channel &channel = *(*chan_it);
+		user_list = channelUsers(channel, *this, op_only);
+		for (std::vector<User *>::const_iterator it = user_list.begin(); it != user_list.end();
+			 it++) {
+			const User &user = *(*it);
+			if (channel.ops.find(user.id) != channel.ops.end()) {
+				channel_ops.insert(user.id);
 			}
-			u_it++;
 		}
 	}
 	else {
-		std::vector<User *>::const_iterator u_it = this->m_users.begin();
-		std::vector<User *>::const_iterator u_end = this->m_users.end();
-		while (u_it != u_end) {
-			if (patternMatch(mask, (*u_it)->nickname) || patternMatch(mask, (*u_it)->hostname) ||
-				patternMatch(mask, (*u_it)->username)) {
-				if (!op_only || this->m_ops.find((*u_it)->id) != this->m_ops.end()) {
-					user_list.push_back(*u_it);
-				}
+		user_list = matchingUsers(mask, m_users, m_ops, op_only);
+	}
+	for (size_t i = 0; i < user_list.size(); i++) {
+		this->rplWhoReply(client, *user_list[i], mask, channel_ops);
+	}
+	this->rplEndOfWho(client, mask);
+}
+
+static std::vector<User *> channelUsers(const Channel &channel, const Server &server,
+										const bool op_only)
+{
+	std::vector<User *> users;
+	for (std::set<size_t>::const_iterator user_id_it = channel.users.begin();
+		 user_id_it != channel.users.end(); user_id_it++) {
+		std::vector<User *>::const_iterator user_pos = server.getUserById(*user_id_it);
+		if (user_pos != server.getUsers().end()) {
+			User &channel_user = *(*user_pos);
+			if (not op_only or server.isUserOp(channel_user, channel)) {
+				users.push_back(&channel_user);
 			}
-			u_it++;
 		}
 	}
+	return users;
+}
 
-	std::string msg = getReplyBase(RPL_WHOREPLY, user) + " " + mask + " ";
-	for (size_t i = 0; i < user_list.size(); i++) {
-		User *u = user_list[i];
-		std::string msg_end =
-			u->username + " " + u->hostname + " " + u->servername + " " + u->nickname + " " + "H";
-		if (this->m_ops.find(u->id) != this->m_ops.end())
-			msg_end += "*";
-		if (chan_ops.find(u->id) != chan_ops.end())
-			msg_end += "@";
-		msg_end += " :0 " + u->realname;
-		user.send(msg + msg_end + "\n\r");
+static std::vector<User *> matchingUsers(const std::string &pattern,
+										 const std::vector<User *> &users,
+										 const std::set<size_t> &ops, const bool op_only)
+{
+	std::vector<User *> matching;
+	for (std::vector<User *>::const_iterator user_it = users.begin(); user_it != users.end();
+		 user_it++) {
+		const User &user = *(*user_it);
+		if (patternMatch(pattern, user.nickname) || patternMatch(pattern, user.hostname) ||
+			patternMatch(pattern, user.username)) {
+			if (!op_only || ops.find(user.id) != ops.end()) {
+				matching.push_back(*user_it);
+			}
+		}
 	}
-	this->rplEndOfWho(user, mask);
+	return matching;
 }
