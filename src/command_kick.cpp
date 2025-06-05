@@ -15,7 +15,7 @@ void Server::commandKick(const Command &cmd, User &user) const
 		return;
 	}
 	Channel &channel = *(*chan_pos);
-	if (channel.ops.find(user.id) == channel.ops.end()) {
+	if (!this->isUserOp(user, channel)) {
 		this->errChanOPrivsNeeded(user, channel_name);
 		return;
 	}

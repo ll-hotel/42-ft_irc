@@ -87,7 +87,7 @@ void Server::commandMode(const Command &command, User &user)
 		this->rplChannelModeIs(user, **channel);
 		return;
 	}
-	if (!isUserOp(user, **channel)) {
+	if (!this->isUserOp(user, **channel)) {
 		this->errChanOPrivsNeeded(user, channel_name);
 		// not_op ERR_CHANOPRIVSNEEDED
 		return;

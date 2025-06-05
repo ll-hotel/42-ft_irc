@@ -25,19 +25,21 @@ void Server::commandJoin(const Command &command, User &user)
 	else {
 		chan = (*channel_it);
 	}
-	if (chan->password_set) {
-		if (command.args.size() < 2 or command.args[1] != chan->password) {
-			this->errBadChannelKey(user, chan->name());
+	if (this->m_ops.find(user.id) == this->m_ops.end()) {
+		if (chan->password_set) {
+			if (command.args.size() < 2 or command.args[1] != chan->password) {
+				this->errBadChannelKey(user, chan->name());
+				return;
+			}
+		}
+		if (chan->users.size() >= chan->limit_user) {
+			this->errChannelIsFull(user, chan->name());
 			return;
 		}
-	}
-	if (chan->users.size() >= chan->limit_user) {
-		this->errChannelIsFull(user, chan->name());
-		return;
-	}
-	if (chan->invite_only && user.inviteList.find(chan->id) == user.inviteList.end()) {
-		errInviteOnlyChan(user, chan->name());
-		return;
+		if (chan->invite_only && user.inviteList.find(chan->id) == user.inviteList.end()) {
+			errInviteOnlyChan(user, chan->name());
+			return;
+		}
 	}
 	this->connectUserToChannel(user, *chan);
 	chan->broadcast(':' + user.clientName(m_hostname) + " JOIN " + chan->name() + "\r\n");

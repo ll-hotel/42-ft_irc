@@ -20,7 +20,7 @@ void Server::commandTopic(const Command &command, User &user)
 		return;
 	}
 	if (command.args.size() == 2) {
-		if (!channel.topic_op_only or isUserOp(user, channel)) {
+		if (!channel.topic_op_only or this->isUserOp(user, channel)) {
 			channel.topic = command.args[1];
 		}
 		else {

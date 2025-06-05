@@ -30,7 +30,7 @@ void Server::commandWho(const Command &command, User &user) const
 		while (u_it != u_end) {
 			std::vector<User *>::const_iterator u = getUserById(*u_it);
 			if (u != m_users.end()) {
-				if (!op_only || isUserOp(**u, **chan_it)) {
+				if (!op_only || this->isUserOp(**u, **chan_it)) {
 					user_list.push_back(*u);
 				}
 				if ((*chan_it)->ops.find(*u_it) != (*chan_it)->ops.end())

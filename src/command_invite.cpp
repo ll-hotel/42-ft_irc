@@ -32,7 +32,7 @@ void Server::commandInvite(const Command &cmd, User &user) const
 		this->errNotOnChannel(user, channel_name);
 		return;
 	}
-	if (channel.inviteOnly and channel.ops.find(user.id) == channel.ops.end()) {
+	if (channel.inviteOnly and !this->isUserOp(user, channel)) {
 		this->errChanOPrivsNeeded(user, channel_name);
 		return;
 	}
