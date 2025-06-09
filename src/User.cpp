@@ -1,32 +1,30 @@
 #include "User.hpp"
 #include "TcpSocket.hpp"
-#include <iostream>
 #include <stdexcept>
+
+#define USER_BUFFER_SIZE_LIMIT 4096
+#define USER_REQUEST_SIZE_LIMIT 512
 
 User::User(const TcpStream &stream, const SocketAddr &addr, Epoll &epoll)
 	: stream(stream), addr(addr), didPass(false), didNick(false), didUser(false), id(createId()),
-	  quit(false), m_epoll(epoll)
+	  quit(false), m_invalidCommand(false), m_epoll(epoll)
 {
-	std::cerr << "User " << this->stream.rawFd() << " created" << std::endl;
 }
 
 User::~User()
 {
-	std::cerr << "User " << stream.rawFd() << " deleted" << std::endl;
 }
-
-#define USER_BUFFER_SIZE_LIMIT 536870912
 
 bool User::receive()
 {
-	if (this->m_streamBuffer.size() >= USER_BUFFER_SIZE_LIMIT)
+	if (m_readBuffer.size() >= USER_BUFFER_SIZE_LIMIT)
 		return true;
 	static char recv_buffer[1024] = {0};
 	const ssize_t recv_size = this->stream.recv(recv_buffer, sizeof(recv_buffer) - 1);
 	if (recv_size <= 0)
 		return false;
 	recv_buffer[recv_size] = '\0';
-	this->m_streamBuffer.append(recv_buffer);
+	m_readBuffer.append(recv_buffer);
 	return true;
 }
 
@@ -51,12 +49,23 @@ bool User::flush()
 
 bool User::parseNextCommand()
 {
-	const size_t crlf = this->m_streamBuffer.find("\r\n");
-	if (crlf == std::string::npos)
+	const size_t crlf = m_readBuffer.find("\r\n");
+	if (m_invalidCommand or crlf == std::string::npos or crlf > USER_REQUEST_SIZE_LIMIT) {
+		m_readBuffer.erase(0, crlf);
+		if (crlf == std::string::npos)
+			m_invalidCommand = true;
+		else
+			m_invalidCommand = false;
 		return false;
-	this->nextCommand = Command(this->m_streamBuffer.substr(0, crlf));
-	this->m_streamBuffer.erase(0, crlf + 2);
+	}
+	this->nextCommand = Command(m_readBuffer.substr(0, crlf));
+	m_readBuffer.erase(0, crlf + 2);
 	return true;
+}
+
+bool User::isInvalidCommand() const
+{
+	return m_invalidCommand;
 }
 
 bool User::registered() const throw()

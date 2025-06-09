@@ -2,9 +2,11 @@
 #include "Command.hpp"
 #include "Epoll.hpp"
 #include <iostream>
+#include <fstream>
 #include <stdexcept>
 #include <stdint.h>
 #include <ctime>
+#include <string>
 
 Server::Server(uint16_t port, const std::string &password)
 	: m_socket(port), m_epoll(200), m_password(password), m_running(true), m_hostname("ft_irc")
@@ -17,6 +19,13 @@ Server::Server(uint16_t port, const std::string &password)
 		m_created = std::string(buf, len);
 	}
 	m_epoll.ctlAdd(m_socket.rawFd(), EPOLLIN);
+	{
+		std::ifstream motd_file;
+		motd_file.open("motd.txt");
+		if (motd_file.is_open()) {
+			std::getline(motd_file, m_motd, '\0');
+		}
+	}
 }
 
 Server::~Server()
@@ -81,7 +90,6 @@ void Server::routine()
 	}
 	for (ssize_t cur_act = 0; cur_act < action_count; cur_act++) {
 		const EpollEvent &event = events[cur_act];
-		std::cerr << event << std::endl;
 		if (event.data.fd == m_socket.rawFd()) {
 			std::pair<TcpStream, SocketAddr> tmp = m_socket.accept();
 			User *user = new User(tmp.first, tmp.second, m_epoll);
@@ -91,7 +99,6 @@ void Server::routine()
 		}
 		std::vector<User *>::const_iterator user_pos = getUserByFd(event.data.fd);
 		if (user_pos == m_users.end()) {
-			std::cerr << "No such client" << std::endl;
 			::close(event.data.fd);
 			m_epoll.ctlDel(event.data.fd);
 			continue;
@@ -107,7 +114,6 @@ void Server::routine()
 				continue;
 			}
 			while (user.parseNextCommand()) {
-				std::cerr << user.nickname << ": " << user.nextCommand << std::endl;
 				this->processCommand(user.nextCommand, user);
 			}
 			if (user.quit)
@@ -128,12 +134,10 @@ void Server::delUser(const size_t id)
 {
 	std::vector<User *>::iterator user_pos = this->getUserById(id);
 	if (user_pos == m_users.end()) {
-		std::cerr << "WARN: try to delete invalid User" << std::endl;
 		return;
 	}
 	User *const user_ptr = (*user_pos);
 	if (user_ptr == NULL) {
-		std::cerr << "WARN: try to delete invalid User 'NULL'" << std::endl;
 	}
 	else {
 		User &user = (*user_ptr);
@@ -165,16 +169,10 @@ void Server::delChannel(const size_t id)
 {
 	std::vector<Channel *>::iterator chan_pos = this->getChannelById(id);
 	if (chan_pos == m_channels.end()) {
-		std::cerr << "WARN: try to delete invalid chan" << std::endl;
 		return;
 	}
 	Channel *const chan_ptr = (*chan_pos);
-	if (chan_ptr == NULL) {
-		std::cerr << "WARN: try to delete invalid chan 'NULL'" << std::endl;
-	}
-	else {
-		Channel &chan = (*chan_ptr);
-		std::cerr << "Removing channel " << chan.name() << std::endl;
+	if (chan_ptr != NULL) {
 		delete chan_ptr;
 	}
 	m_channels.erase(chan_pos);
@@ -217,8 +215,6 @@ void Server::processCommand(const Command &command, User &user)
 		return;
 	}
 	else if (not user.didPass) {
-		std::cerr << "User " << user.stream.rawFd() << " tried to " << command.name
-				  << " while not authenticated" << std::endl;
 		return;
 	}
 	if (command.id == Command::NICK) {
@@ -230,8 +226,6 @@ void Server::processCommand(const Command &command, User &user)
 		return;
 	}
 	else if (not user.registered()) {
-		std::cerr << "User " << user.stream.rawFd() << " tried to " << command.name
-				  << " while not registered" << std::endl;
 		return;
 	}
 	switch (command.id) {

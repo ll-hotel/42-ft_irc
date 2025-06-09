@@ -244,14 +244,12 @@ void Server::rplISupport(User &user) const
 void Server::rplMOTDStart(User &user) const
 {
 	user.send(buildNumericReplyBase(RPL_MOTDSTART, m_hostname, user) + ":- " + m_hostname +
-			  RPL_MOTDSTART_MESSAGE " -\r\n");
+			  " " RPL_MOTDSTART_MESSAGE " -\r\n");
 }
 
-void Server::rplMOTD(User &user) const
+void Server::rplMOTD(User &user, const std::string &motd) const
 {
-	user.send(buildNumericReplyBase(RPL_MOTD, m_hostname, user) +
-	          ":Message of the day! Yay!"
-	          "\r\n");
+	user.send(buildNumericReplyBase(RPL_MOTD, m_hostname, user) + ':' + motd + "\r\n");
 }
 
 void Server::rplEndOfMOTD(User &user) const

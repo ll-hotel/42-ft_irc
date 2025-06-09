@@ -13,6 +13,20 @@ void Server::commandMOTD(const Command &cmd, User &user) const
 		return;
 	}
 	this->rplMOTDStart(user);
-	this->rplMOTD(user);
+
+	size_t line_pos = 0;
+	std::string line;
+	do {
+		size_t newline = m_motd.find("\n", line_pos);
+		line = m_motd.substr(line_pos, newline - line_pos);
+		if (newline != std::string::npos) {
+			line_pos += line.size() + 1;
+		}
+		else {
+			line_pos = newline;
+		}
+		this->rplMOTD(user, line);
+	} while (line_pos < m_motd.size());
+
 	this->rplEndOfMOTD(user);
 }

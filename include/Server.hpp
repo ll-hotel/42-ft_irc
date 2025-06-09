@@ -90,7 +90,7 @@ public:
 	void rplMyInfo(User &user) const;
 	void rplISupport(User &user) const;
 	void rplMOTDStart(User &user) const;
-	void rplMOTD(User &user) const;
+	void rplMOTD(User &user, const std::string &motd) const;
 	void rplEndOfMOTD(User &user) const;
 	void rplNoTopic(User &user, const std::string &channel) const;
 	void rplTopic(User &user, const std::string &channel, const std::string &topic) const;
