@@ -23,9 +23,11 @@ SOURCES += command_invite.cpp
 SOURCES += command_mode.cpp
 SOURCES += command_motd.cpp
 SOURCES += command_ping.cpp
+SOURCES += command_who.cpp
 SOURCES += ft_split.cpp
 SOURCES += patternMatch.cpp
 SOURCES += numeric_replies.cpp
+SOURCES += utils.cpp
 
 SOURCE_DIR := src
 BUILD_DIR := build

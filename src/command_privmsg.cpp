@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include "utils.hpp"
 
 void Server::commandPrivMsg(const Command &cmd, User &user) const
 {
@@ -6,7 +7,7 @@ void Server::commandPrivMsg(const Command &cmd, User &user) const
 		this->errNoRecipient(user, cmd.name);
 		return;
 	}
-	const std::string &dest = cmd.args[0];
+	const std::string dest = strTolower(cmd.args[0]);
 	if (cmd.args.size() < 2) {
 		this->errNoTextToSend(user);
 		return;

@@ -100,6 +100,27 @@ void Server::rplEndOfNames(User &user, const std::string &channel) const
 			  " :" RPL_ENDOFNAMES_MESSAGE "\r\n");
 }
 
+void Server::rplWhoReply(User &client, const User &user, const std::string &mask,
+						 const std::set<size_t> &ops) const
+{
+	std::string message = buildNumericReplyBase(RPL_WHOREPLY, m_hostname, client) + mask + ' ' +
+						  user.hostname + ' ' + user.servername + ' ' + user.nickname + " H";
+	if (m_ops.find(user.id) != m_ops.end()) {
+		message += '*';
+	}
+	if (ops.find(user.id) != ops.end()) {
+		message += '@';
+	}
+	message.append(" :0 " + user.realname + "\r\n");
+	client.send(message);
+}
+
+void Server::rplEndOfWho(User &user, const std::string &chan) const
+{
+	user.send(buildNumericReplyBase(RPL_ENDOFWHO, m_hostname, user) + chan + " :" +
+			  "End of WHO list" + "\r\n");
+}
+
 void Server::rplWelcome(User &user) const
 {
 	user.send(buildNumericReplyBase(RPL_WELCOME, m_hostname, user) + ":" RPL_WELCOME_MESSAGE
@@ -152,11 +173,15 @@ void Server::rplChannelModeIs(User &user, const Channel &channel) const
 {
 	std::string flag = "+";
 	std::string args;
-	std::string msg = ":" + this->m_hostname + " MODE " + (channel).name() + " ";
+	std::string msg = this->getReplyBase(RPL_CHANNELMODEIS, user) + " ";
 
 	if (channel.password_set) {
 		flag += "k";
-		args.append(channel.password);
+		if (channel.users.find(user.id) == channel.users.end()) {
+			args.append(channel.password.size(), '*');
+		}
+		else
+			args.append(channel.password);
 		args.append(" ");
 	}
 	if (channel.limit_user != (size_t)(-1)) {
@@ -170,7 +195,7 @@ void Server::rplChannelModeIs(User &user, const Channel &channel) const
 	if (channel.invite_only) {
 		flag += "i";
 	}
-	msg += " " + flag + " " + args;
+	msg += channel.name() + " " + (flag.size() != 1 ? (flag + " " + args) : "");
 	user.send(msg + "\r\n");
 }
 
@@ -248,4 +273,15 @@ void Server::errNoMOTD(User &user) const
 void Server::errNoOrigin(User &user) const
 {
 	user.send(buildNumericReplyBase(ERR_NOORIGIN, m_hostname, user) + ERR_NOORIGIN_MESSAGE "\r\n");
+}
+
+void Server::rplNoTopic(User &user, const std::string &channel) const
+{
+	user.send(buildNumericReplyBase(RPL_NOTOPIC, m_hostname, user) + channel +
+			  " :" RPL_NOTOPIC_MESSAGE "\r\n");
+}
+
+void Server::rplTopic(User &user, const std::string &channel, const std::string &topic) const
+{
+	user.send(buildNumericReplyBase(RPL_TOPIC, m_hostname, user) + channel + " :" + topic + "\r\n");
 }

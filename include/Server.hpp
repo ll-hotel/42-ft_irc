@@ -36,14 +36,13 @@ public:
 	void connectUserToChannel(User &user, Channel &chan) const;
 	void processCommand(const Command &command, User &user);
 
-	void commandPass(const Command &command, User &user) const;
+	void commandPass(const Command &command, User &user);
 	void commandNick(const Command &command, User &user) const;
 	void commandUser(const Command &command, User &user) const;
 	void commandJoin(const Command &command, User &user);
 	void commandQuit(const Command &command, User &user);
 	void commandMode(const Command &command, User &user);
 	void commandNames(const Command &command, User &user) const;
-	// implement me is_user_op
 	void commandTopic(const Command &command, User &user);
 	void commandPart(const Command &command, User &user);
 	void commandPrivMsg(const Command &command, User &user) const;
@@ -51,6 +50,7 @@ public:
 	void commandInvite(const Command &command, User &user) const;
 	void commandMOTD(const Command &command, User &user) const;
 	void commandPing(const Command &command, User &user) const;
+	void commandWho(const Command &command, User &user) const;
 
 	std::string getReplyBase(const NumericReplyCode code, const User &user) const;
 	void errNeedMoreParams(User &user, const std::string &cmd) const;
@@ -74,6 +74,9 @@ public:
 	void errNoOrigin(User &user) const;
 
 	void rplEndOfNames(User &user, const std::string &chan) const;
+	void rplWhoReply(User &client, const User &user, const std::string &chan,
+					 const std::set<size_t> &ops) const;
+	void rplEndOfWho(User &user, const std::string &chan) const;
 	void rplNamReply(User &user, const std::string &chan) const;
 	void rplInviting(User &user, const std::string &nick, const std::string &chan) const;
 	void rplInviteList(User &user, const std::string &chan) const;
@@ -89,6 +92,8 @@ public:
 	void rplMOTDStart(User &user) const;
 	void rplMOTD(User &user) const;
 	void rplEndOfMOTD(User &user) const;
+	void rplNoTopic(User &user, const std::string &channel) const;
+	void rplTopic(User &user, const std::string &channel, const std::string &topic) const;
 
 	std::vector<User *>::iterator getUserByFd(int fd) throw();
 	std::vector<User *>::iterator getUserById(size_t id) throw();

@@ -23,7 +23,8 @@ struct Command
 		MODE,
 		INVITE,
 		MOTD,
-		PING
+		PING,
+		WHO
 	} id;
 
 	explicit Command();

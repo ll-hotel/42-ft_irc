@@ -1,6 +1,7 @@
 #include "Channel.hpp"
 #include "Server.hpp"
 #include "ft_split.hpp"
+#include "utils.hpp"
 
 void Server::commandNames(const Command &cmd, User &user) const
 {
@@ -10,7 +11,7 @@ void Server::commandNames(const Command &cmd, User &user) const
 	}
 	std::vector<std::string> channels = ft_split(cmd.args[0], ',');
 	for (size_t i = 0; i < channels.size(); i += 1) {
-		const std::string &channel_name = channels[i];
+		const std::string channel_name = strTolower(channels[i]);
 		std::vector<Channel *>::const_iterator chan_pos = this->getChannelByName(channel_name);
 		if (chan_pos == m_channels.end()) {
 			this->rplEndOfNames(user, channel_name);
