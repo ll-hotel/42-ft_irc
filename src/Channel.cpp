@@ -3,7 +3,7 @@
 #include "User.hpp"
 
 Channel::Channel(const std::string &name, Server &server)
-	: id(createId()), inviteOnly(false), m_server(server), m_name(name)
+	: id(createId()), invite_only(false), m_server(server), m_name(name)
 {
 	topic_op_only = true;
 	password_set = false;
