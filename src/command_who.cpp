@@ -39,7 +39,8 @@ void Server::commandWho(const Command &command, User &client) const
 		user_list = matchingUsers(mask, m_users, m_ops, op_only);
 	}
 	for (size_t i = 0; i < user_list.size(); i++) {
-		this->rplWhoReply(client, *user_list[i], mask, channel_ops);
+		if (user_list[i]->registered())
+			this->rplWhoReply(client, *user_list[i], mask, channel_ops);
 	}
 	this->rplEndOfWho(client, mask);
 }
