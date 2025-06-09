@@ -7,7 +7,7 @@
 #include <ctime>
 
 Server::Server(uint16_t port, const std::string &password)
-	: m_socket(port), m_epoll(1000), m_password(password), m_running(true), m_hostname("ft_irc")
+	: m_socket(port), m_epoll(200), m_password(password), m_running(true), m_hostname("ft_irc")
 {
 	{
 		const time_t timer = std::time(0);
