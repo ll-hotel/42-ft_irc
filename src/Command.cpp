@@ -62,6 +62,7 @@ static Command::Id find_id(const std::string &command_name) throw()
 	}
 	else if (command_name == "PING") {
 		return Command::PING;
+	}
 	else if (command_name == "WHO") {
 		return Command::WHO;
 	}

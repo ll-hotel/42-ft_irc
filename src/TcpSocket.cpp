@@ -1,7 +1,6 @@
 #include "TcpSocket.hpp"
 #include "TcpStream.hpp"
-#include <cerrno>
-#include <cstring>
+#include <asm-generic/socket.h>
 #include <netinet/in.h>
 #include <sstream>
 #include <sys/socket.h>
@@ -33,6 +32,10 @@ TcpSocket::TcpSocket(uint16_t port) : m_fd(-1)
 	m_fd = ::socket(DEFAULT_FAMILY, DEFAULT_STREAM, 0);
 	if (m_fd == -1) {
 		throw std::runtime_error("Could not create TCP socket on port " + ft_ltoa(port));
+	}
+	const int optval = 1;
+	if (::setsockopt(m_fd, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval)) == -1) {
+		throw std::runtime_error("Could not set socket option");
 	}
 	sockaddr_in address = {};
 	address.sin_family = DEFAULT_FAMILY;

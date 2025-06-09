@@ -52,14 +52,6 @@ std::vector<User *>::const_iterator Server::getUserByFd(int fd) const throw()
 	return m_users.end();
 }
 
-std::vector<User *>::iterator Server::getUserByFd(int fd) throw()
-{
-	for (size_t i = 0; i < m_users.size(); i++)
-		if (m_users[i]->stream.rawFd() == fd)
-			return m_users.begin() + i;
-	return m_users.end();
-}
-
 std::vector<User *>::const_iterator Server::getUserById(size_t id) const throw()
 {
 	for (size_t i = 0; i < m_users.size(); i++)
@@ -272,6 +264,7 @@ void Server::processCommand(const Command &command, User &user)
 		break;
 	case Command::PING:
 		this->commandPing(command, user);
+		break;
 	case Command::WHO:
 		this->commandWho(command, user);
 		break;
