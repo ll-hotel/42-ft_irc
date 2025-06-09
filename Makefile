@@ -77,8 +77,16 @@ run: $(NAME)
 .PHONY: valgrind
 valgrind: $(NAME)
 ifeq ("$(port)", "")
-	eval port="8080"
+	$(eval port=8080)
 endif
-	valgrind -q --track-fds=all ./$(NAME) $(port) bocal
+	valgrind -q --track-origins=yes --leak-check=full --track-fds=all ./$(NAME) $(port) bocal
+
+.PHONY: fsan
+fsan: CXXFLAGS+=-fsanitize=leak,address
+fsan: $(NAME)
+ifeq ("$(port)", "")
+	$(eval port=8080)
+endif
+	./$(NAME) $(port) bocal
 
 -include $(DEPENDS)

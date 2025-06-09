@@ -14,7 +14,7 @@ SocketAddr::SocketAddr(const struct sockaddr &addr) throw()
 		m_kind = V4;
 		m_v4 = (const struct sockaddr_in &)addr.sa_data;
 	}
-	else {
+	else if (addr.sa_family == AF_INET6) {
 		m_kind = V6;
 		m_v6 = (const struct sockaddr_in6 &)addr.sa_data;
 	}
