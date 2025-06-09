@@ -1,4 +1,4 @@
-#include <ft_split.hpp>
+#include "ft_split.hpp"
 #include <string>
 
 static bool patternReq(const std::string &pat, const std::string &str, size_t pat_cur,
@@ -26,9 +26,13 @@ static bool patternReq(const std::string &pat, const std::string &str, size_t pa
 
 bool patternMatch(const std::vector<std::string> &patterns, const std::string &str)
 {
-	for (size_t i = 0; i < patterns.size(); i++)
+	for (size_t i = 0; i < patterns.size(); i++) {
+		if (patterns[i].empty()) {
+			continue;
+		}
 		if (patternReq(patterns[i], str, 0, 0))
 			return (true);
+	}
 	return false;
 }
 
