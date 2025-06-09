@@ -73,6 +73,9 @@ void Server::routine()
 	std::vector<EpollEvent> events(20);
 	ssize_t action_count = m_epoll.wait(events);
 	if (action_count == -1) {
+		if (errno & EINTR) {
+			return;
+		}
 		m_running = false;
 		throw std::runtime_error("epoll: wait");
 	}
