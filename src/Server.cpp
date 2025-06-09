@@ -4,11 +4,18 @@
 #include <iostream>
 #include <stdexcept>
 #include <stdint.h>
-#include <unistd.h>
+#include <ctime>
 
 Server::Server(uint16_t port, const std::string &password)
-	: m_socket(port), m_epoll(1000), m_password(password), m_running(true), m_hostname("localhost")
+	: m_socket(port), m_epoll(1000), m_password(password), m_running(true), m_hostname("ft_irc")
 {
+	{
+		const time_t timer = std::time(0);
+		struct tm *timeinfo = std::localtime(&timer);
+		char buf[128];
+		size_t len = strftime(buf, sizeof(buf), "%d %B %Y", timeinfo);
+		m_created = std::string(buf, len);
+	}
 	m_epoll.ctlAdd(m_socket.rawFd(), EPOLLIN);
 }
 
@@ -38,14 +45,6 @@ try {
 }
 
 std::vector<User *>::const_iterator Server::getUserByFd(int fd) const throw()
-{
-	for (size_t i = 0; i < m_users.size(); i++)
-		if (m_users[i]->stream.rawFd() == fd)
-			return m_users.begin() + i;
-	return m_users.end();
-}
-
-std::vector<User *>::iterator Server::getUserByFd(int fd) throw()
 {
 	for (size_t i = 0; i < m_users.size(); i++)
 		if (m_users[i]->stream.rawFd() == fd)
@@ -259,6 +258,12 @@ void Server::processCommand(const Command &command, User &user)
 		break;
 	case Command::MODE:
 		this->commandMode(command, user);
+		break;
+	case Command::MOTD:
+		this->commandMOTD(command, user);
+		break;
+	case Command::PING:
+		this->commandPing(command, user);
 		break;
 	case Command::WHO:
 		this->commandWho(command, user);

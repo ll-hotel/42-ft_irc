@@ -15,9 +15,11 @@ User::~User()
 	std::cerr << "User " << stream.rawFd() << " deleted" << std::endl;
 }
 
+#define USER_BUFFER_SIZE_LIMIT 536870912
+
 bool User::receive()
 {
-	if (this->m_streamBuffer.size() >= 8192)
+	if (this->m_streamBuffer.size() >= USER_BUFFER_SIZE_LIMIT)
 		return true;
 	static char recv_buffer[1024] = {0};
 	const ssize_t recv_size = this->stream.recv(recv_buffer, sizeof(recv_buffer) - 1);

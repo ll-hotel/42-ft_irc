@@ -15,6 +15,12 @@ void Server::commandUser(const Command &command, User &user) const
 	user.servername = command.args[2];
 	user.realname = command.args[3];
 	user.didUser = true;
-	if (user.registered())
+	if (user.registered()) {
 		this->rplWelcome(user);
+		this->rplYourHost(user);
+		this->rplCreated(user);
+		this->rplMyInfo(user);
+		this->rplISupport(user);
+		this->commandMOTD(Command("MOTD"), user);
+	}
 }

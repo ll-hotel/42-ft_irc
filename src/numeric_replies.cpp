@@ -2,6 +2,7 @@
 #include "Server.hpp"
 #include "User.hpp"
 #include "reply_info.hpp"
+#include <bits/types/struct_timeval.h>
 #include <string>
 
 static std::string buildNumericReplyBase(const NumericReplyCode &code, const std::string &host,
@@ -208,6 +209,70 @@ void Server::errUnknownMode(User &user, const std::string &channel_name, std::st
 	msg.append(channel_name);
 	msg.append("\r\n");
 	user.send(msg);
+}
+
+void Server::rplYourHost(User &user) const
+{
+	user.send(buildNumericReplyBase(RPL_YOURHOST, m_hostname, user) + ":Your host is " +
+			  m_hostname + "\r\n");
+}
+
+void Server::rplCreated(User &user) const
+{
+	user.send(buildNumericReplyBase(RPL_CREATED, m_hostname, user) +
+			  ":This server was created on " + m_created + "\r\n");
+}
+
+void Server::rplMyInfo(User &user) const
+{
+	user.send(buildNumericReplyBase(RPL_MYINFO, m_hostname, user) + m_hostname + " 1.0.0 o litko\r\n");
+}
+
+void Server::rplISupport(User &user) const
+{
+	user.send(buildNumericReplyBase(RPL_ISUPPORT, m_hostname, user) +
+			  "CASEMAPPING=ascii "
+			  "-CHANLIMIT "
+			  "MODES=l,i,t,k,o "
+			  "NETWORK=" +
+			  m_hostname +
+			  " "
+			  ":are supported by this server"
+			  "\r\n");
+}
+
+void Server::rplMOTDStart(User &user) const
+{
+	user.send(buildNumericReplyBase(RPL_MOTDSTART, m_hostname, user) + ":- " + m_hostname +
+			  RPL_MOTDSTART_MESSAGE " -\r\n");
+}
+
+void Server::rplMOTD(User &user) const
+{
+	user.send(buildNumericReplyBase(RPL_MOTD, m_hostname, user) +
+	          ":Message of the day! Yay!"
+	          "\r\n");
+}
+
+void Server::rplEndOfMOTD(User &user) const
+{
+	user.send(buildNumericReplyBase(RPL_ENDOFMOTD, m_hostname, user) + RPL_ENDOFMOTD_MESSAGE
+			  "\r\n");
+}
+
+void Server::errNoSuchServer(User &user, const std::string &server) const
+{
+	user.send(buildNumericReplyBase(ERR_NOSUCHSERVER, m_hostname, user) + server + "\r\n");
+}
+
+void Server::errNoMOTD(User &user) const
+{
+	user.send(buildNumericReplyBase(ERR_NOMOTD, m_hostname, user) + ERR_NOMOTD_MESSAGE "\r\n");
+}
+
+void Server::errNoOrigin(User &user) const
+{
+	user.send(buildNumericReplyBase(ERR_NOORIGIN, m_hostname, user) + ERR_NOORIGIN_MESSAGE "\r\n");
 }
 
 void Server::rplNoTopic(User &user, const std::string &channel) const
