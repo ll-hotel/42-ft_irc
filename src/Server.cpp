@@ -10,7 +10,7 @@
 #include <string>
 
 Server::Server(uint16_t port, const std::string &password, const std::string &op_pas)
-	: m_socket(port), m_epoll(200), m_password(password), m_running(true), m_hostname("ft_irc"),
+	: m_socket(port), m_epoll(200), m_password(password), m_running(true), m_hostname("webserv"),
 	  m_operatorPassWord(op_pas)
 {
 	{
