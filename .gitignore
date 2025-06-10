@@ -34,3 +34,10 @@ ircserv
 
 # Vscode
 .vscode/settings.json
+
+# Clangd
+.cache/
+compile_commands.json
+
+# Misc
+motd.txt
