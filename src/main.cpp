@@ -13,7 +13,7 @@ int main(int const argc, char const *argv[])
 try {
 	std::signal(SIGINT, sigint_handler);
 
-	if (argc > 4)
+	if (argc < 3 or argc > 4)
 		return (error(argv[0], 0));
 	if (!is_number(argv[1]))
 		return (error(argv[0], 1));
@@ -43,7 +43,7 @@ static int error(const std::string &exec_file_name, int cause)
 		std::cerr << "bad command format:" << std::endl;
 	else if (cause == 1)
 		std::cerr << "'port' need to be a number:" << std::endl;
-	std::cerr << "\t" + exec_file_name + " <port> <password>" << std::endl;
+	std::cerr << "\t" + exec_file_name + " <port> <password> [<admin password>]" << std::endl;
 	return (2);
 }
 
