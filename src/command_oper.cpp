@@ -7,10 +7,10 @@ void Server::commandOper(const Command &command, User &user)
 		return;
 	}
 	if (command.args[1] != m_operatorPassWord) {
-		errPasswMisMatch(user);
+		this->errPasswdMismatch(user);
 		return;
 	}
 	user.username = command.args[0];
-	this->m_ops.insert(user.id);
-	rplYourOper(user);
+	m_ops.insert(user.id);
+	this->rplYoureOper(user);
 }

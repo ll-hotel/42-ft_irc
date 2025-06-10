@@ -25,7 +25,7 @@ private:
 	const std::string m_operatorPassWord;
 
 public:
-	explicit Server(uint16_t port, const std::string &password);
+	explicit Server(uint16_t port, const std::string &password, const std::string &op_pass);
 	~Server();
 	void run();
 	void routine();
@@ -59,7 +59,7 @@ public:
 	void errChanOPrivsNeeded(User &user, const std::string &channel) const;
 	void errUserNotInChannel(User &user, const std::string &nick, const std::string &channel) const;
 	void errAlreadyRegistered(User &user) const;
-	void errPasswMisMatch(User &user) const;
+	void errPasswdMismatch(User &user) const;
 	void errNoSuchChannel(User &user, const std::string &channel_name) const;
 	void errNotOnChannel(User &user, const std::string &channel_name) const;
 	void errNoRecipient(User &user, const std::string &cmd) const;
@@ -89,7 +89,7 @@ public:
 	void rplWelcome(User &user) const;
 	void rplChannelModeIs(User &user, const Channel &channel) const;
 	void rplYourHost(User &user) const;
-	void rplYourOper(User &user) const;
+	void rplYoureOper(User &user) const;
 	void rplCreated(User &user) const;
 	void rplMyInfo(User &user) const;
 	void rplISupport(User &user) const;

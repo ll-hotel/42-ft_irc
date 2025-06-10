@@ -48,9 +48,9 @@ void Server::errAlreadyRegistered(User &user) const
 			  " :" ERR_ALREADYREGISTERED_MESSAGE "\r\n");
 }
 
-void Server::errPasswMisMatch(User &user) const
+void Server::errPasswdMismatch(User &user) const
 {
-	user.send(buildNumericReplyBase(ERR_NOTEXTTOSEND, m_hostname, user) + ":Password incorrect" +
+	user.send(buildNumericReplyBase(ERR_PASSWDMISMATCH, m_hostname, user) + ":Password incorrect" +
 			  "\r\n");
 }
 
@@ -223,9 +223,9 @@ void Server::rplYourHost(User &user) const
 			  m_hostname + "\r\n");
 }
 
-void Server::rplYourOper(User &user) const
+void Server::rplYoureOper(User &user) const
 {
-	user.send(buildNumericReplyBase(RPL_YOURHOST, m_hostname, user) +
+	user.send(buildNumericReplyBase(RPL_YOUREOPER, m_hostname, user) +
 			  ":You are now an IRC operator" + "\r\n");
 }
 

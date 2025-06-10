@@ -9,16 +9,19 @@ static void sigint_handler(int);
 
 bool sigint_received = false;
 
-int main(int argc, char **argv)
+int main(int const argc, char const *argv[])
 try {
 	std::signal(SIGINT, sigint_handler);
 
-	if (argc != 3)
+	if (argc > 4)
 		return (error(argv[0], 0));
 	if (!is_number(argv[1]))
 		return (error(argv[0], 1));
-
-	Server server(atol(argv[1]), argv[2]);
+	std::string op_pass = "admin";
+	if (argc == 4) {
+		op_pass = argv[3];
+	}
+	Server server(atol(argv[1]), argv[2], op_pass);
 	server.run();
 	return (0);
 } catch (const std::exception &e) {
