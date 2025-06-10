@@ -66,6 +66,9 @@ static Command::Id find_id(const std::string &command_name) throw()
 	else if (command_name == "WHO") {
 		return Command::WHO;
 	}
+	else if (command_name == "OPER") {
+		return Command::OPER;
+	}
 	return Command::UNKNOWN;
 }
 

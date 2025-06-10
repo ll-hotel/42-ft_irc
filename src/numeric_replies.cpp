@@ -48,6 +48,12 @@ void Server::errAlreadyRegistered(User &user) const
 			  " :" ERR_ALREADYREGISTERED_MESSAGE "\r\n");
 }
 
+void Server::errPasswMisMatch(User &user) const
+{
+	user.send(buildNumericReplyBase(ERR_NOTEXTTOSEND, m_hostname, user) + ":Password incorrect" +
+			  "\r\n");
+}
+
 void Server::errNoRecipient(User &user, const std::string &cmd) const
 {
 	user.send(buildNumericReplyBase(ERR_NORECIPIENT, m_hostname, user) +
@@ -217,6 +223,12 @@ void Server::rplYourHost(User &user) const
 			  m_hostname + "\r\n");
 }
 
+void Server::rplYourOper(User &user) const
+{
+	user.send(buildNumericReplyBase(RPL_YOURHOST, m_hostname, user) +
+			  ":You are now an IRC operator" + "\r\n");
+}
+
 void Server::rplCreated(User &user) const
 {
 	user.send(buildNumericReplyBase(RPL_CREATED, m_hostname, user) +
@@ -225,7 +237,8 @@ void Server::rplCreated(User &user) const
 
 void Server::rplMyInfo(User &user) const
 {
-	user.send(buildNumericReplyBase(RPL_MYINFO, m_hostname, user) + m_hostname + " 1.0.0 o litko\r\n");
+	user.send(buildNumericReplyBase(RPL_MYINFO, m_hostname, user) + m_hostname +
+			  " 1.0.0 o litko\r\n");
 }
 
 void Server::rplISupport(User &user) const
