@@ -93,10 +93,17 @@ void Server::routine()
 	for (ssize_t cur_act = 0; cur_act < action_count; cur_act++) {
 		const EpollEvent &event = events[cur_act];
 		if (event.data.fd == m_socket.rawFd()) {
-			std::pair<TcpStream, SocketAddr> tmp = m_socket.accept();
-			User *user = new User(tmp.first, tmp.second, m_epoll);
-			m_users.push_back(user);
-			m_epoll.ctlAdd(user->stream.rawFd(), EPOLLIN);
+			if (event.events & (EPOLLERR | EPOLLHUP)) {
+				throw std::runtime_error("Socket error: stopping now.");
+			}
+			try {
+				std::pair<TcpStream, SocketAddr> tmp = m_socket.accept();
+				User *const user = new User(tmp.first, tmp.second, m_epoll);
+				m_users.push_back(user);
+				m_epoll.ctlAdd(user->stream.rawFd(), EPOLLIN);
+			} catch (const std::runtime_error &err) {
+				std::cerr << err.what() << std::endl;
+			}
 			continue;
 		}
 		std::vector<User *>::const_iterator user_pos = getUserByFd(event.data.fd);
@@ -128,8 +135,10 @@ void Server::routine()
 #endif
 				this->processCommand(user.nextCommand, user);
 			}
-			if (user.quit)
+			if (user.quit) {
 				this->delUser(user.id);
+				continue;
+			}
 		}
 		if (event.events & EPOLLOUT) {
 			try {
