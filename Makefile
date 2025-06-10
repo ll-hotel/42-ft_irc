@@ -24,6 +24,7 @@ SOURCES += command_mode.cpp
 SOURCES += command_motd.cpp
 SOURCES += command_ping.cpp
 SOURCES += command_who.cpp
+SOURCES += command_oper.cpp
 SOURCES += ft_split.cpp
 SOURCES += patternMatch.cpp
 SOURCES += numeric_replies.cpp

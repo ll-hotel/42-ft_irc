@@ -9,8 +9,9 @@
 #include <stdint.h>
 #include <string>
 
-Server::Server(uint16_t port, const std::string &password)
-	: m_socket(port), m_epoll(200), m_password(password), m_running(true), m_hostname("ft_irc")
+Server::Server(uint16_t port, const std::string &password, const std::string &op_pas)
+	: m_socket(port), m_epoll(200), m_password(password), m_running(true), m_hostname("ft_irc"),
+	  m_operatorPassWord(op_pas)
 {
 	{
 		const time_t timer = std::time(0);
@@ -275,6 +276,9 @@ void Server::processCommand(const Command &command, User &user)
 		break;
 	case Command::WHO:
 		this->commandWho(command, user);
+		break;
+	case Command::OPER:
+		this->commandOper(command, user);
 		break;
 	case Command::UNKNOWN:
 	default:

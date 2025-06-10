@@ -22,9 +22,10 @@ private:
 	std::set<size_t> m_ops;
 	std::string m_created;
 	std::string m_motd;
+	const std::string m_operatorPassWord;
 
 public:
-	explicit Server(uint16_t port, const std::string &password);
+	explicit Server(uint16_t port, const std::string &password, const std::string &op_pass);
 	~Server();
 	void run();
 	void routine();
@@ -36,7 +37,7 @@ public:
 	void connectUserToChannel(User &user, Channel &chan) const;
 	void processCommand(const Command &command, User &user);
 
-	void commandPass(const Command &command, User &user);
+	void commandPass(const Command &command, User &user) const;
 	void commandNick(const Command &command, User &user) const;
 	void commandUser(const Command &command, User &user) const;
 	void commandJoin(const Command &command, User &user);
@@ -51,12 +52,14 @@ public:
 	void commandMOTD(const Command &command, User &user) const;
 	void commandPing(const Command &command, User &user) const;
 	void commandWho(const Command &command, User &user) const;
+	void commandOper(const Command &command, User &user);
 
 	std::string getReplyBase(const NumericReplyCode code, const User &user) const;
 	void errNeedMoreParams(User &user, const std::string &cmd) const;
 	void errChanOPrivsNeeded(User &user, const std::string &channel) const;
 	void errUserNotInChannel(User &user, const std::string &nick, const std::string &channel) const;
 	void errAlreadyRegistered(User &user) const;
+	void errPasswdMismatch(User &user) const;
 	void errNoSuchChannel(User &user, const std::string &channel_name) const;
 	void errNotOnChannel(User &user, const std::string &channel_name) const;
 	void errNoRecipient(User &user, const std::string &cmd) const;
@@ -86,6 +89,7 @@ public:
 	void rplWelcome(User &user) const;
 	void rplChannelModeIs(User &user, const Channel &channel) const;
 	void rplYourHost(User &user) const;
+	void rplYoureOper(User &user) const;
 	void rplCreated(User &user) const;
 	void rplMyInfo(User &user) const;
 	void rplISupport(User &user) const;

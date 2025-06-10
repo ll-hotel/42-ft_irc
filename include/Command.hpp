@@ -24,7 +24,8 @@ struct Command
 		INVITE,
 		MOTD,
 		PING,
-		WHO
+		WHO,
+		OPER
 	} id;
 
 	explicit Command();
