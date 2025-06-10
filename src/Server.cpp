@@ -1,11 +1,12 @@
 #include "Server.hpp"
 #include "Command.hpp"
 #include "Epoll.hpp"
-#include <iostream>
+#include <cerrno>
+#include <ctime>
 #include <fstream>
+#include <iostream>
 #include <stdexcept>
 #include <stdint.h>
-#include <ctime>
 #include <string>
 
 Server::Server(uint16_t port, const std::string &password)
@@ -114,6 +115,16 @@ void Server::routine()
 				continue;
 			}
 			while (user.parseNextCommand()) {
+#ifdef DEBUG
+				std::cout << user.id << " (" << (user.nickname.empty() ? "*" : user.nickname)
+						  << "): " << user.nextCommand.name;
+				for (std::vector<std::string>::const_iterator arg_it =
+						 user.nextCommand.args.begin();
+					 arg_it != user.nextCommand.args.end(); arg_it++) {
+					std::cout << ' ' << '"' << *arg_it << '"';
+				}
+				std::cout << std::endl;
+#endif
 				this->processCommand(user.nextCommand, user);
 			}
 			if (user.quit)

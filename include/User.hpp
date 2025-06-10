@@ -36,10 +36,8 @@ struct User
 	bool parseNextCommand();
 	bool registered() const throw();
 	std::string clientName(const std::string &host) const;
-	bool isInvalidCommand() const;
 
 private:
-	bool m_invalidCommand;
 	std::string m_readBuffer;
 	std::string m_sendBuffer;
 	Epoll &m_epoll;

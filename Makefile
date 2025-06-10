@@ -75,6 +75,7 @@ run: $(NAME)
 
 
 .PHONY: valgrind
+valgrind: CXXFLAGS+=-D DEBUG
 valgrind: $(NAME)
 ifeq ("$(port)", "")
 	$(eval port=8080)
@@ -82,7 +83,7 @@ endif
 	valgrind -q --track-origins=yes --leak-check=full --track-fds=all ./$(NAME) $(port) bocal
 
 .PHONY: fsan
-fsan: CXXFLAGS+=-fsanitize=leak,address
+fsan: CXXFLAGS+=-D DEBUG -fsanitize=leak,address
 fsan: $(NAME)
 ifeq ("$(port)", "")
 	$(eval port=8080)

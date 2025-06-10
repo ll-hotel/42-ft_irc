@@ -1,24 +1,39 @@
 #include "User.hpp"
 #include "TcpSocket.hpp"
 #include <stdexcept>
+#ifdef DEBUG
+#include <iostream>
+#endif
 
 #define USER_BUFFER_SIZE_LIMIT 4096
 #define USER_REQUEST_SIZE_LIMIT 512
 
 User::User(const TcpStream &stream, const SocketAddr &addr, Epoll &epoll)
 	: stream(stream), addr(addr), didPass(false), didNick(false), didUser(false), id(createId()),
-	  quit(false), m_invalidCommand(false), m_epoll(epoll)
+	  quit(false), m_epoll(epoll)
 {
+#ifdef DEBUG
+	std::cout << this->id << " (" << (this->nickname.empty() ? "*" : this->nickname) << "): Created"
+			  << std::endl;
+#endif
 }
 
 User::~User()
 {
+#ifdef DEBUG
+	std::cout << this->id << " (" << (this->nickname.empty() ? "*" : this->nickname) << "): Deleted"
+			  << std::endl;
+#endif
 }
 
 bool User::receive()
 {
 	if (m_readBuffer.size() >= USER_BUFFER_SIZE_LIMIT)
 		return true;
+#ifdef DEBUG
+	std::cout << this->id << " (" << (this->nickname.empty() ? "*" : this->nickname) << "): Reading"
+			  << std::endl;
+#endif
 	static char recv_buffer[1024] = {0};
 	const ssize_t recv_size = this->stream.recv(recv_buffer, sizeof(recv_buffer) - 1);
 	if (recv_size <= 0)
@@ -37,6 +52,10 @@ void User::send(const std::string &message)
 
 bool User::flush()
 {
+#ifdef DEBUG
+	std::cout << this->id << " (" << (this->nickname.empty() ? "*" : this->nickname) << "): Sending"
+			  << std::endl;
+#endif
 	ssize_t len = stream.send(m_sendBuffer.c_str(), m_sendBuffer.size());
 	if (len == -1)
 		throw std::runtime_error("Could not send to " + ft_ltoa(this->stream.rawFd()));
@@ -50,22 +69,15 @@ bool User::flush()
 bool User::parseNextCommand()
 {
 	const size_t crlf = m_readBuffer.find("\r\n");
-	if (m_invalidCommand or crlf == std::string::npos or crlf > USER_REQUEST_SIZE_LIMIT) {
-		m_readBuffer.erase(0, crlf);
-		if (crlf == std::string::npos)
-			m_invalidCommand = true;
-		else
-			m_invalidCommand = false;
+	if (crlf == std::string::npos) {
+		if (m_readBuffer.size() >= USER_BUFFER_SIZE_LIMIT) {
+			m_readBuffer.clear();
+		}
 		return false;
 	}
 	this->nextCommand = Command(m_readBuffer.substr(0, crlf));
 	m_readBuffer.erase(0, crlf + 2);
 	return true;
-}
-
-bool User::isInvalidCommand() const
-{
-	return m_invalidCommand;
 }
 
 bool User::registered() const throw()
