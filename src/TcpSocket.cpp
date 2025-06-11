@@ -53,7 +53,6 @@ TcpSocket::TcpSocket(uint16_t port) : m_fd(-1)
 
 TcpSocket::~TcpSocket() throw()
 {
-	::shutdown(m_fd, SHUT_RDWR);
 	::close(m_fd);
 }
 

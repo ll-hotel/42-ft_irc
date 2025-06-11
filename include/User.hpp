@@ -27,6 +27,7 @@ struct User
 	bool quit;
 	std::string quitMessage;
 	std::set<size_t> inviteList;
+	bool greeted;
 
 	User(const TcpStream &stream, const SocketAddr &addr, Epoll &server);
 	~User();

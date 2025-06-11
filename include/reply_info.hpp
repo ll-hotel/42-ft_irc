@@ -16,9 +16,10 @@
 #define RPL_ENDOFINVITELIST_MESSAGE "End of /INVITE list"
 #define RPL_WELCOME_MESSAGE "Welcome to our IRC server!"
 #define RPL_MOTDSTART_MESSAGE "Message of the day"
-#define RPL_ENDOFMOTD_MESSAGE "End of /MOTD command."
-#define ERR_NOMOTD_MESSAGE "No message of the day."
-#define ERR_NOORIGIN_MESSAGE "No message of the day."
+#define RPL_ENDOFMOTD_MESSAGE "End of /MOTD command"
+#define ERR_NOMOTD_MESSAGE "No message of the day"
+#define ERR_NOORIGIN_MESSAGE "No origin was given"
+#define ERR_ERRONEUSNICKNAME_MESSAGE "Invalid nickname"
 
 enum NumericReplyCode {
 	RET_ZERO = 0,
@@ -41,8 +42,7 @@ enum NumericReplyCode {
 	ERR_CHANNELISFULL = 471,
 	ERR_BADCHANNELKEY = 475,
 	ERR_INVITEONLYCHAN = 473,
-	// ERR_ERRONEUSNICKNAME = 432, /* Not used, because we do not have a
-	// nickname 'blacklist' */
+	ERR_ERRONEUSNICKNAME = 432,
 	ERR_NICKNAMEINUSE = 433,
 	ERR_NICKCOLLISION = 436,
 	RPL_YOUREOPER = 381,

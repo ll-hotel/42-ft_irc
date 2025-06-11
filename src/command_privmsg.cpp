@@ -22,8 +22,13 @@ void Server::commandPrivMsg(const Command &cmd, User &user) const
 			std::vector<Channel *>::const_iterator chan_pos = this->getChannelByName(target);
 			if (chan_pos != m_channels.end()) {
 				Channel &dest_chan = *(*chan_pos);
-				dest_chan.privmsg(user.id, ':' + user.clientName(m_hostname) + " PRIVMSG " +
-											   dest_chan.name() + " :" + message + "\r\n");
+				if (dest_chan.users.find(user.id) != dest_chan.users.end()) {
+					this->errNotOnChannel(user, dest_chan.name());
+				}
+				else {
+					dest_chan.privmsg(user.id, ':' + user.clientName(m_hostname) + " PRIVMSG " +
+												   dest_chan.name() + " :" + message + "\r\n");
+				}
 				continue;
 			}
 		}

@@ -9,8 +9,8 @@
 #define USER_REQUEST_SIZE_LIMIT 512
 
 User::User(const TcpStream &stream, const SocketAddr &addr, Epoll &epoll)
-	: stream(stream), addr(addr), didPass(false), didNick(false), didUser(false), id(createId()),
-	  quit(false), m_epoll(epoll)
+	: stream(stream), addr(addr), didPass(false), didNick(false), didUser(false), id(createId()), quit(false),
+	  greeted(false), m_epoll(epoll)
 {
 #ifdef DEBUG
 	std::cout << this->id << " (" << (this->nickname.empty() ? "*" : this->nickname) << "): Created"

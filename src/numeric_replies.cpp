@@ -8,7 +8,7 @@
 static std::string buildNumericReplyBase(const NumericReplyCode &code, const std::string &host,
 										 const User &user)
 {
-	return ':' + host + ' ' + ft_ltoa(code) + ' ' + user.nickname + ' ';
+	return ':' + host + ' ' + ft_ltoa(code) + ' ' + (user.nickname.empty() ? "*" : user.nickname) + ' ';
 }
 
 void Server::errNoSuchChannel(User &user, const std::string &channel) const
@@ -295,4 +295,10 @@ void Server::rplNoTopic(User &user, const std::string &channel) const
 void Server::rplTopic(User &user, const std::string &channel, const std::string &topic) const
 {
 	user.send(buildNumericReplyBase(RPL_TOPIC, m_hostname, user) + channel + " :" + topic + "\r\n");
+}
+
+void Server::errErroneusNickname(User &user, const std::string &nick) const
+{
+	user.send(buildNumericReplyBase(ERR_ERRONEUSNICKNAME, m_hostname, user) + nick +
+			  " :" ERR_ERRONEUSNICKNAME_MESSAGE "\r\n");
 }

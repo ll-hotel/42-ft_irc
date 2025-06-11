@@ -75,6 +75,7 @@ public:
 	void errNoSuchServer(User &user, const std::string &serv) const;
 	void errNoMOTD(User &user) const;
 	void errNoOrigin(User &user) const;
+	void errErroneusNickname(User &user, const std::string &nick) const;
 
 	void rplEndOfNames(User &user, const std::string &chan) const;
 	void rplWhoReply(User &client, const User &user, const std::string &chan,

@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include "utils.hpp"
 
 void Server::commandNick(const Command &command, User &user) const
 {
@@ -7,6 +8,10 @@ void Server::commandNick(const Command &command, User &user) const
 		return;
 	}
 	const std::string &new_nick = command.args[0];
+	if (not isvalid_nick(new_nick)) {
+		this->errErroneusNickname(user, new_nick);
+		return;
+	}
 	if (user.nickname == new_nick) {
 		this->errNicknameInUse(user, new_nick);
 		return;
@@ -19,12 +24,4 @@ void Server::commandNick(const Command &command, User &user) const
 	}
 	user.nickname = new_nick;
 	user.didNick = true;
-	if (user.registered()) {
-		this->rplWelcome(user);
-		this->rplYourHost(user);
-		this->rplCreated(user);
-		this->rplMyInfo(user);
-		this->rplISupport(user);
-		this->commandMOTD(Command("MOTD"), user);
-	}
 }

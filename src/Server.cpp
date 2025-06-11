@@ -194,6 +194,10 @@ void Server::delChannel(const size_t id)
 	}
 	Channel *const chan_ptr = (*chan_pos);
 	if (chan_ptr != NULL) {
+		Channel const &channel = *chan_ptr;
+		for (size_t i = 0; i < m_users.size(); i += 1) {
+			m_users[i]->inviteList.erase(channel.id);
+		}
 		delete chan_ptr;
 	}
 	m_channels.erase(chan_pos);
@@ -239,12 +243,22 @@ void Server::processCommand(const Command &command, User &user)
 	else if (not user.didPass) {
 		return;
 	}
-	if (command.id == Command::NICK) {
-		this->commandNick(command, user);
-		return;
-	}
-	else if (command.id == Command::USER) {
-		this->commandUser(command, user);
+	if (command.id == Command::NICK or command.id == Command::USER) {
+		if (command.id == Command::NICK) {
+			this->commandNick(command, user);
+		}
+		else if (command.id == Command::USER) {
+			this->commandUser(command, user);
+		}
+		if (not user.greeted) {
+			user.greeted = true;
+			this->rplWelcome(user);
+			this->rplYourHost(user);
+			this->rplCreated(user);
+			this->rplMyInfo(user);
+			this->rplISupport(user);
+			this->commandMOTD(Command("MOTD"), user);
+		}
 		return;
 	}
 	else if (not user.registered()) {

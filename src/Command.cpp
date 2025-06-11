@@ -11,6 +11,9 @@ static void parse_args(const std::string &input, size_t pos, std::vector<std::st
 
 Command::Command(const std::string &input) : name(), args(), id(UNKNOWN)
 {
+	if (not str_isprint(input)) {
+		return;
+	}
 	name = input.substr(0, input.find(' '));
 	this->name = strToupper(this->name);
 	this->id = find_id(this->name);
@@ -86,7 +89,9 @@ static void parse_args(const std::string &input, size_t pos, std::vector<std::st
 		else {
 			word_end = input.find_first_of(' ', pos);
 		}
-		args.push_back(input.substr(pos, word_end - pos));
+		if (word_end - pos > 0) {
+			args.push_back(input.substr(pos, word_end - pos));
+		}
 		pos = word_end;
 	}
 }

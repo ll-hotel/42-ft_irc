@@ -54,7 +54,8 @@ void Server::commandJoin(const Command &cmd, User &user)
 
 static inline bool is_valid_channel_char(const char &c) throw()
 {
-	return std::isprint(c) and c != ' ' and c != ',';
+	static const std::string set = " \a\r\n,";
+	return c != '\0' and set.find(c) == set.npos;
 }
 
 static bool is_valid_channel_name(const std::string &name) throw()
