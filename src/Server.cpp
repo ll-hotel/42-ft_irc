@@ -159,31 +159,31 @@ void Server::delUser(const size_t id)
 	}
 	User *const user_ptr = (*user_pos);
 	if (user_ptr == NULL) {
+		return;
 	}
-	else {
-		User &user = (*user_ptr);
-		m_epoll.ctlDel(user.stream.rawFd());
-		const std::string msg =
-			':' + user.nickname + '!' + user.username + '@' + m_hostname + ' ' + "QUIT" + ' ';
+	User &user = (*user_ptr);
+	m_epoll.ctlDel(user.stream.rawFd());
+	const std::string msg =
+		':' + user.nickname + '!' + user.username + '@' + m_hostname + ' ' + "QUIT" + ' ';
 
-		while (not user.channels.empty()) {
-			const size_t chan_id = (*user.channels.begin());
-			std::vector<Channel *>::const_iterator const chan_pos = this->getChannelById(chan_id);
-			if (chan_pos == m_channels.end()) {
-				continue;
-			}
-			Channel &chan = *(*chan_pos);
-			this->removeChannelUser(chan, user);
-			std::string sendmsg;
-			if (user.quit)
-				sendmsg = msg + user.quitMessage;
-			else
-				sendmsg = msg + chan.name() + " :Disconnected";
-			chan.broadcast(sendmsg + "\r\n");
+	while (not user.channels.empty()) {
+		const size_t chan_id = (*user.channels.begin());
+		std::vector<Channel *>::const_iterator const chan_pos = this->getChannelById(chan_id);
+		if (chan_pos == m_channels.end()) {
+			continue;
 		}
-		delete user_ptr;
-		m_users.erase(user_pos);
+		Channel &chan = *(*chan_pos);
+		this->removeChannelUser(chan, user);
+		std::string sendmsg;
+		if (user.quit)
+			sendmsg = msg + user.quitMessage;
+		else
+			sendmsg = msg + chan.name() + " :Disconnected";
+		chan.broadcast(sendmsg + "\r\n");
 	}
+	m_ops.erase(user.id);
+	delete user_ptr;
+	m_users.erase(user_pos);
 }
 
 void Server::delChannel(const size_t id)
@@ -202,6 +202,7 @@ void Server::delChannel(const size_t id)
 void Server::removeChannelUser(Channel &chan, User &user) const
 {
 	chan.users.erase(user.id);
+	chan.ops.erase(user.id);
 	user.channels.erase(chan.id);
 }
 
