@@ -10,7 +10,7 @@ static std::vector<User *> matchingUsers(const std::string &pattern,
 void Server::commandWho(const Command &command, User &client) const
 {
 	const bool op_only = (command.args.size() > 1 && command.args[1] == "o");
-	std::string mask = (command.args.empty() ? "*" : command.args[0]);
+	std::string mask = ((command.args.empty() || command.args[0].empty()) ? "*" : command.args[0]);
 
 	std::vector<User *> user_list;
 	std::set<size_t> channel_ops;

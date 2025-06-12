@@ -41,3 +41,7 @@ compile_commands.json
 
 # Misc
 motd.txt
+script/brutalize.sh
+script/connector.sh
+script/join_script.sh
+script/ping_script.sh
