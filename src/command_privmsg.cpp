@@ -8,7 +8,7 @@ void Server::commandPrivMsg(const Command &cmd, User &user) const
 		this->errNoRecipient(user, cmd.name);
 		return;
 	}
-	const std::string targets_str = strTolower(cmd.args[0]);
+	const std::string targets_str = cmd.args[0];
 	if (cmd.args.size() < 2) {
 		this->errNoTextToSend(user);
 		return;
@@ -19,7 +19,7 @@ void Server::commandPrivMsg(const Command &cmd, User &user) const
 		 target_it != targets.end(); target_it++) {
 		const std::string &target = *target_it;
 		{
-			std::vector<Channel *>::const_iterator chan_pos = this->getChannelByName(target);
+			std::vector<Channel *>::const_iterator chan_pos = this->getChannelByName(strTolower(target));
 			if (chan_pos != m_channels.end()) {
 				Channel &dest_chan = *(*chan_pos);
 				if (dest_chan.users.find(user.id) == dest_chan.users.end()) {
