@@ -29,7 +29,8 @@ struct User
 	std::set<size_t> inviteList;
 	bool greeted;
 
-	User(const TcpStream &stream, const SocketAddr &addr, Epoll &server);
+	User(const TcpStream &stream, const SocketAddr &addr, Epoll &epoll);
+	User(User const &other);
 	~User();
 	bool receive();
 	void send(const std::string &message);

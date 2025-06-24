@@ -20,7 +20,7 @@ Server::Server(uint16_t port, const std::string &password, const std::string &op
 		size_t len = strftime(buf, sizeof(buf), "%d %B %Y", timeinfo);
 		m_created = std::string(buf, len);
 	}
-	m_epoll.ctlAdd(m_socket.rawFd(), EPOLLIN);
+	m_epoll->ctlAdd(m_socket.rawFd(), EPOLLIN);
 	{
 		std::ifstream motd_file;
 		motd_file.open("motd.txt");
@@ -32,15 +32,7 @@ Server::Server(uint16_t port, const std::string &password, const std::string &op
 
 Server::~Server()
 {
-	m_epoll.ctlDel(m_socket.rawFd());
-	while (not m_users.empty()) {
-		delete m_users.front();
-		m_users.erase(m_users.begin());
-	}
-	while (not m_channels.empty()) {
-		delete m_channels.front();
-		m_channels.erase(m_channels.begin());
-	}
+	m_epoll->ctlDel(m_socket.rawFd());
 }
 
 extern bool sigint_received;
@@ -55,34 +47,26 @@ try {
 	std::cerr << e.what() << std::endl;
 }
 
-std::vector<User *>::const_iterator Server::getUserByFd(int fd) const throw()
+Option<Rc<User> > Server::getUserByFd(int fd) const throw()
 {
 	for (size_t i = 0; i < m_users.size(); i++)
 		if (m_users[i]->stream.rawFd() == fd)
-			return m_users.begin() + i;
-	return m_users.end();
+			return m_users[i];
+	return Option<Rc<User> >::None;
 }
 
-std::vector<User *>::const_iterator Server::getUserById(size_t id) const throw()
+Option<Rc<User> > Server::getUserById(size_t id) const throw()
 {
 	for (size_t i = 0; i < m_users.size(); i++)
 		if (m_users[i]->id == id)
-			return m_users.begin() + i;
-	return m_users.end();
-}
-
-std::vector<User *>::iterator Server::getUserById(size_t id) throw()
-{
-	for (size_t i = 0; i < m_users.size(); i++)
-		if (m_users[i]->id == id)
-			return m_users.begin() + i;
-	return m_users.end();
+			return m_users[i];
+	return Option<Rc<User> >::None;
 }
 
 void Server::routine()
 {
 	std::vector<EpollEvent> events(20);
-	ssize_t action_count = m_epoll.wait(events);
+	ssize_t action_count = m_epoll->wait(events);
 	if (action_count == -1) {
 		if (errno & EINTR) {
 			return;
@@ -98,18 +82,18 @@ void Server::routine()
 			}
 			try {
 				std::pair<TcpStream, SocketAddr> tmp = m_socket.accept();
-				User *const user = new User(tmp.first, tmp.second, m_epoll);
+				Rc<User> user = Rc<User>(User(tmp.first, tmp.second, m_epoll));
+				m_epoll->ctlAdd(user->stream.rawFd(), EPOLLIN);
 				m_users.push_back(user);
-				m_epoll.ctlAdd(user->stream.rawFd(), EPOLLIN);
 			} catch (const std::runtime_error &err) {
 				std::cerr << err.what() << std::endl;
 			}
 			continue;
 		}
-		std::vector<User *>::const_iterator user_pos = getUserByFd(event.data.fd);
+		std::vector<Rc<User> >::const_iterator user_pos = getUserByFd(event.data.fd);
 		if (user_pos == m_users.end()) {
 			::close(event.data.fd);
-			m_epoll.ctlDel(event.data.fd);
+			m_epoll->ctlDel(event.data.fd);
 			continue;
 		}
 		User &user = *(*user_pos);
@@ -153,26 +137,14 @@ void Server::routine()
 
 void Server::delUser(const size_t id)
 {
-	std::vector<User *>::iterator user_pos = this->getUserById(id);
-	if (user_pos == m_users.end()) {
-		return;
-	}
-	User *const user_ptr = (*user_pos);
-	if (user_ptr == NULL) {
-		return;
-	}
-	User &user = (*user_ptr);
-	m_epoll.ctlDel(user.stream.rawFd());
+	User &user = this->getUserById(id).unwrap().deref_mut();
+	m_epoll->ctlDel(user.stream.rawFd());
 	const std::string msg =
 		':' + user.nickname + '!' + user.username + '@' + m_hostname + ' ' + "QUIT" + ' ';
 
 	while (not user.channels.empty()) {
 		const size_t chan_id = (*user.channels.begin());
-		std::vector<Channel *>::const_iterator const chan_pos = this->getChannelById(chan_id);
-		if (chan_pos == m_channels.end()) {
-			continue;
-		}
-		Channel &chan = *(*chan_pos);
+		Channel &chan = this->getChannelById(chan_id).unwrap().deref_mut();
 		this->removeChannelUser(chan, user);
 		std::string sendmsg;
 		if (user.quit)
@@ -182,25 +154,26 @@ void Server::delUser(const size_t id)
 		chan.broadcast(sendmsg + "\r\n");
 	}
 	m_ops.erase(user.id);
-	delete user_ptr;
-	m_users.erase(user_pos);
+	for (size_t i = 0; i < m_users.size(); i += 1) {
+		if (m_users[i]->id == user.id) {
+			m_users.erase(m_users.begin() + i);
+			break;
+		}
+	}
 }
 
 void Server::delChannel(const size_t id)
 {
-	std::vector<Channel *>::iterator chan_pos = this->getChannelById(id);
-	if (chan_pos == m_channels.end()) {
-		return;
+	Rc<Channel> channel = this->getChannelById(id).unwrap();
+	for (size_t i = 0; i < m_users.size(); i += 1) {
+		m_users[i]->inviteList.erase(channel->id);
 	}
-	Channel *const chan_ptr = (*chan_pos);
-	if (chan_ptr != NULL) {
-		Channel const &channel = *chan_ptr;
-		for (size_t i = 0; i < m_users.size(); i += 1) {
-			m_users[i]->inviteList.erase(channel.id);
+	for (size_t i = 0; i < m_channels.size(); i += 1) {
+		if (m_channels[i]->id == channel->id) {
+			m_channels.erase(m_channels.begin() + i);
+			break;
 		}
-		delete chan_ptr;
 	}
-	m_channels.erase(chan_pos);
 }
 
 void Server::removeChannelUser(Channel &chan, User &user) const
@@ -210,28 +183,28 @@ void Server::removeChannelUser(Channel &chan, User &user) const
 	user.channels.erase(chan.id);
 }
 
-std::vector<Channel *>::iterator Server::getChannelById(const size_t id) throw()
+Option<Rc<Channel> > Server::getChannelById(const size_t id) throw()
 {
-	for (std::vector<Channel *>::iterator chan_it = m_channels.begin(); chan_it != m_channels.end();
-		 chan_it++) {
-		Channel &chan = *(*chan_it);
-		if (chan.id == id) {
-			return chan_it;
-		}
-	}
-	return m_channels.end();
-}
-
-std::vector<Channel *>::const_iterator Server::getChannelById(const size_t id) const throw()
-{
-	for (std::vector<Channel *>::const_iterator chan_it = m_channels.begin();
+	for (std::vector<Rc<Channel> >::iterator chan_it = m_channels.begin();
 		 chan_it != m_channels.end(); chan_it++) {
 		Channel &chan = *(*chan_it);
 		if (chan.id == id) {
-			return chan_it;
+			return *chan_it;
 		}
 	}
-	return m_channels.end();
+	return Option<Rc<Channel> >::None;
+}
+
+Option<Rc<Channel> > Server::getChannelById(const size_t id) const throw()
+{
+	for (std::vector<Rc<Channel> >::const_iterator chan_it = m_channels.begin();
+		 chan_it != m_channels.end(); chan_it++) {
+		Channel &chan = *(*chan_it);
+		if (chan.id == id) {
+			return *chan_it;
+		}
+	}
+	return Option<Rc<Channel> >::None;
 }
 
 void Server::processCommand(const Command &command, User &user)
@@ -325,21 +298,21 @@ std::string Server::getReplyBase(const NumericReplyCode code, const User &user) 
 	return (reply_str);
 }
 
-std::vector<Channel *>::iterator Server::getChannelByName(const std::string &name) throw()
+Option<Rc<Channel> > Server::getChannelByName(const std::string &name) throw()
 {
-	for (std::vector<Channel *>::iterator it = m_channels.begin(); it != m_channels.end(); it++) {
+	for (std::vector<Rc<Channel> >::iterator it = m_channels.begin(); it != m_channels.end(); it++) {
 		if ((*it)->name() == name)
-			return it;
+			return *it;
 	}
-	return m_channels.end();
+	return Option<Rc<Channel> >::None;
 }
 
-const std::vector<User *> &Server::getUsers() const
+const std::vector<Rc<User> > &Server::getUsers() const
 {
 	return (m_users);
 }
 
-const std::vector<Channel *> &Server::getChannels() const
+const std::vector<Rc<Channel> > &Server::getChannels() const
 {
 	return (m_channels);
 }
@@ -363,7 +336,7 @@ void Server::cleanChannel()
 	bool foundEmptyChannel = true;
 	while (foundEmptyChannel) {
 		foundEmptyChannel = false;
-		for (std::vector<Channel *>::iterator chan_it = m_channels.begin();
+		for (std::vector<Rc<Channel> >::iterator chan_it = m_channels.begin();
 			 not foundEmptyChannel and chan_it != m_channels.end(); chan_it++) {
 			Channel &chan = *(*chan_it);
 			if (chan.users.empty()) {
@@ -383,22 +356,23 @@ void Server::connectUserToChannel(User &user, Channel &chan) const
 	user.channels.insert(chan.id);
 }
 
-std::vector<Channel *>::const_iterator Server::getChannelByName(const std::string &name) const
+Option<Rc<Channel> > Server::getChannelByName(const std::string &name) const
 	throw()
 {
-	for (std::vector<Channel *>::const_iterator it = m_channels.begin(); it != m_channels.end();
+	for (std::vector<Rc<Channel> >::const_iterator it = m_channels.begin(); it != m_channels.end();
 		 it++) {
 		if ((*it)->name() == name)
-			return it;
+			return *it;
 	}
-	return m_channels.end();
+	return Option<Rc<Channel> >::None;
 }
 
-std::vector<User *>::const_iterator Server::getUserbyNickname(const std::string &nick) const throw()
+Option<Rc<User> > Server::getUserbyNickname(const std::string &nick) const
+	throw()
 {
-	for (std::vector<User *>::const_iterator it = m_users.begin(); it != m_users.end(); it++) {
+	for (std::vector<Rc<User> >::const_iterator it = m_users.begin(); it != m_users.end(); it++) {
 		if ((*it)->nickname == nick)
-			return it;
+			return *it;
 	}
-	return m_users.end();
+	return Option<Rc<User> >::None;
 }

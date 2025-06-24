@@ -3,6 +3,8 @@
 #include "Channel.hpp"
 #include "Command.hpp"
 #include "Epoll.hpp"
+#include "Option.hpp"
+#include "Rc.hpp"
 #include "TcpSocket.hpp"
 #include "User.hpp"
 #include "reply_info.hpp"
@@ -13,9 +15,9 @@ class Server
 {
 private:
 	TcpSocket m_socket;
-	Epoll m_epoll;
-	std::vector<User *> m_users;
-	std::vector<Channel *> m_channels;
+	Rc<Epoll, int> m_epoll;
+	std::vector<Rc<User> > m_users;
+	std::vector<Rc<Channel> > m_channels;
 	std::string m_password;
 	bool m_running;
 	std::string m_hostname;
@@ -100,15 +102,15 @@ public:
 	void rplNoTopic(User &user, const std::string &channel) const;
 	void rplTopic(User &user, const std::string &channel, const std::string &topic) const;
 
-	std::vector<User *>::const_iterator getUserByFd(int fd) const throw();
-	std::vector<User *>::iterator getUserById(size_t id) throw();
-	std::vector<User *>::const_iterator getUserById(size_t id) const throw();
-	std::vector<Channel *>::iterator getChannelByName(const std::string &name) throw();
-	std::vector<Channel *>::iterator getChannelById(size_t id) throw();
-	std::vector<Channel *>::const_iterator getChannelById(size_t id) const throw();
-	std::vector<Channel *>::const_iterator getChannelByName(const std::string &name) const throw();
-	std::vector<User *>::const_iterator getUserbyNickname(const std::string &name) const throw();
-	const std::vector<User *> &getUsers() const;
-	const std::vector<Channel *> &getChannels() const;
+	Option<Rc<User> > getUserByFd(int fd) const throw();
+	Option<Rc<User> > getUserById(size_t id) throw();
+	Option<Rc<User> > getUserById(size_t id) const throw();
+	Option<Rc<Channel> > getChannelByName(const std::string &name) throw();
+	Option<Rc<Channel> > getChannelById(size_t id) throw();
+	Option<Rc<Channel> > getChannelById(size_t id) const throw();
+	Option<Rc<Channel> > getChannelByName(const std::string &name) const throw();
+	Option<Rc<User> > getUserbyNickname(const std::string &name) const throw();
+	const std::vector<Rc<User> > &getUsers() const;
+	const std::vector<Rc<Channel> > &getChannels() const;
 	const std::set<size_t> &getOps() const;
 };

@@ -18,6 +18,13 @@ User::User(const TcpStream &stream, const SocketAddr &addr, Epoll &epoll)
 #endif
 }
 
+User::User(User const &other)
+	: stream(other.stream), addr(other.addr), didPass(other.didPass), didNick(other.didNick),
+	  didUser(other.didUser), id(other.id), quit(other.quit), greeted(other.greeted),
+	  m_epoll(other.m_epoll)
+{
+}
+
 User::~User()
 {
 #ifdef DEBUG
